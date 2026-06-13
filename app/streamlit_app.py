@@ -20,7 +20,8 @@ import pandas as pd
 ROOT = Path(__file__).parent.parent
 sys.path.append(str(ROOT / "src"))
 
-from ocr_pipeline import extract_text_from_bytes, ocr_quality_report
+from ocr_pipeline import extract_text_from_bytes, extract_text_from_multiple_files, ocr_quality_report
+from content_validator import validate_economics_essay, get_validation_badge
 from config import RAW_ESSAYS_DIR, EXAMINER_EXPECTATIONS, AS_MARKING_BANDS, IGCSE_MARKING_BANDS
 import sheets_backend as backend
 
@@ -152,6 +153,20 @@ if page == "📝 Submit Essay":
         "with its mark. The more essays we collect, the more accurately the model grades."
     )
 
+    # Show success banner from a previous submission (after rerun, count is fresh)
+    if st.session_state.get("just_submitted"):
+        info = st.session_state.pop("just_submitted")
+        st.balloons()
+        st.markdown(
+            f'<div class="success-box">'
+            f'<h3>✅ Essay submitted successfully!</h3>'
+            f'<p>Saved to {info["backend_label"]}. Dataset now has <strong>{info["total"]} essays</strong>. '
+            f'Thank you for contributing!</p>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+        st.info("You can submit another essay below — the more, the better!")
+
     st.markdown("---")
 
     # ── Step 1: Level & Question Type ─────────────────────────────────────────
@@ -201,19 +216,28 @@ if page == "📝 Submit Essay":
         )
 
     elif input_method == "📄 Upload PDF":
-        uploaded = st.file_uploader("Upload PDF", type=["pdf"])
-        if uploaded:
-            with st.spinner("Extracting text from PDF..."):
-                raw_bytes  = uploaded.read()
-                essay_text, ocr_method = extract_text_from_bytes(raw_bytes, uploaded.name)
-                report     = ocr_quality_report(essay_text, ocr_method)
+        uploaded_files = st.file_uploader(
+            "Upload PDF(s) — multiple files allowed (e.g. one per page)",
+            type=["pdf"],
+            accept_multiple_files=True,
+        )
+        if uploaded_files:
+            with st.spinner(f"Extracting text from {len(uploaded_files)} file(s)..."):
+                files_data = [(f.read(), f.name) for f in uploaded_files]
+                essay_text, ocr_method, page_reports = extract_text_from_multiple_files(files_data)
+                report = ocr_quality_report(essay_text, ocr_method)
 
             if report["quality"] == "good":
-                st.success(f"✓ Text extracted successfully ({report['word_count']} words, method: {ocr_method})")
+                st.success(f"✓ Extracted {report['word_count']} words from {len(uploaded_files)} file(s)")
             elif report["quality"] == "fair":
                 st.warning(f"⚠ Extracted {report['word_count']} words — please check the text below looks correct.")
             else:
-                st.error("Could not extract text well. Try a clearer image or type the essay manually.")
+                st.error("Could not extract text well. Try clearer files or type the essay manually.")
+
+            if len(uploaded_files) > 1:
+                with st.expander("Per-file extraction details"):
+                    for r in page_reports:
+                        st.caption(f"📄 {r['filename']}: {r['word_count']} words ({r['method']})")
 
             for warning in report["warnings"]:
                 st.warning(warning)
@@ -225,26 +249,41 @@ if page == "📝 Submit Essay":
                         essay_text = ""
 
     elif input_method == "🖼️ Upload Image (photo of handwritten essay)":
-        st.info("💡 Tips for best OCR results: good lighting, flat surface, all text in frame, no shadows.")
-        uploaded = st.file_uploader("Upload image", type=["jpg", "jpeg", "png", "webp"])
-        if uploaded:
-            col_img, col_text = st.columns([1, 1])
-            with col_img:
-                st.image(uploaded, caption="Uploaded image", use_column_width=True)
+        st.info(
+            "💡 Tips for best OCR results: good lighting, flat surface, all text in frame, "
+            "no shadows. Upload pages in order if your essay spans multiple pages.\n\n"
+            "⚠️ **Note:** Automatic handwriting recognition is imperfect — always check and "
+            "correct the extracted text below before submitting."
+        )
+        uploaded_files = st.file_uploader(
+            "Upload image(s) — multiple pages allowed, in order",
+            type=["jpg", "jpeg", "png", "webp"],
+            accept_multiple_files=True,
+        )
+        if uploaded_files:
+            # Show thumbnails of all uploaded pages
+            cols = st.columns(min(len(uploaded_files), 4))
+            for i, f in enumerate(uploaded_files):
+                with cols[i % len(cols)]:
+                    st.image(f, caption=f"Page {i+1}: {f.name}", use_column_width=True)
 
-            with st.spinner("Running OCR on image..."):
-                raw_bytes  = uploaded.read()
-                essay_text, ocr_method = extract_text_from_bytes(raw_bytes, uploaded.name)
-                report     = ocr_quality_report(essay_text, ocr_method)
+            with st.spinner(f"Running OCR on {len(uploaded_files)} image(s)..."):
+                files_data = [(f.read(), f.name) for f in uploaded_files]
+                essay_text, ocr_method, page_reports = extract_text_from_multiple_files(files_data)
+                report = ocr_quality_report(essay_text, ocr_method)
 
-            with col_text:
-                if report["quality"] != "poor":
-                    st.success(f"✓ Extracted {report['word_count']} words")
-                else:
-                    st.error("Poor extraction quality")
+            if report["quality"] != "poor":
+                st.success(f"✓ Extracted {report['word_count']} words from {len(uploaded_files)} page(s)")
+            else:
+                st.error("Poor extraction quality — please type the essay manually instead.")
 
-                for warning in report["warnings"]:
-                    st.warning(warning)
+            if len(uploaded_files) > 1:
+                with st.expander("Per-page extraction details"):
+                    for r in page_reports:
+                        st.caption(f"🖼️ {r['filename']}: {r['word_count']} words ({r['method']})")
+
+            for warning in report["warnings"]:
+                st.warning(warning)
 
             if essay_text:
                 st.markdown("**Extracted text — please review and correct any OCR errors:**")
@@ -282,6 +321,31 @@ if page == "📝 Submit Essay":
         height=120,
     )
 
+    # ── Step 3.5: Economics Content Check ─────────────────────────────────────
+    validation_result = None
+    override = False
+
+    if essay_text and len(essay_text.strip()) >= 50:
+        validation_result = validate_economics_essay(essay_text, question)
+        emoji, label = get_validation_badge(validation_result)
+
+        if validation_result["is_valid"]:
+            st.success(f"{emoji} {label}")
+            if validation_result["keywords_found"]:
+                st.caption("Detected: " + ", ".join(validation_result["keywords_found"][:8]))
+            override = True
+        else:
+            st.error(f"{emoji} **{label}**")
+            st.markdown(f"_{validation_result['reason']}_")
+            for w in validation_result["warnings"]:
+                st.warning(w)
+            st.markdown(
+                "**Submission is blocked.** If you're confident this IS a genuine, "
+                "complete economics essay (e.g. unusual phrasing, or OCR missed "
+                "some economics terms), tick the box below to override:"
+            )
+            override = st.checkbox("⚠️ This IS a genuine economics essay — submit anyway")
+
     # ── Step 4: Submit ────────────────────────────────────────────────────────
     st.markdown("---")
 
@@ -297,6 +361,9 @@ if page == "📝 Submit Essay":
         ready = False
     if topic == "-- Select topic --":
         messages.append("⚠ Please select a topic area.")
+        ready = False
+    if validation_result is not None and not validation_result["is_valid"] and not override:
+        messages.append("⚠ This doesn't look like an economics essay. Tick the override box above if you're sure.")
         ready = False
 
     for msg in messages:
@@ -317,17 +384,14 @@ if page == "📝 Submit Essay":
 
         if success:
             new_total = count_essays()
-            st.balloons()
             backend_label = "Google Sheets" if used_backend == "sheets" else "local storage"
-            st.markdown(
-                f'<div class="success-box">'
-                f'<h3>✅ Essay submitted successfully!</h3>'
-                f'<p>Saved to {backend_label}. Dataset now has <strong>{new_total} essays</strong>. '
-                f'Thank you for contributing!</p>'
-                f'</div>',
-                unsafe_allow_html=True,
-            )
-            st.info("You can submit another essay below — the more, the better!")
+            # Store the success info and rerun so the sidebar count refreshes
+            # immediately and the banner shows on the fresh page load.
+            st.session_state["just_submitted"] = {
+                "backend_label": backend_label,
+                "total":         new_total,
+            }
+            st.rerun()
         else:
             st.error("Something went wrong saving your essay. Please try again.")
 

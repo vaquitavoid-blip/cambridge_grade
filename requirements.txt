@@ -9,6 +9,7 @@
 
 # Data handling
 pandas==2.2.2
+numpy==1.26.4
 openpyxl==3.1.2       # Excel support for essay spreadsheets
 
 # OCR — for reading PDFs and images
@@ -16,6 +17,7 @@ pdfplumber==0.11.0        # Extract text from digital PDFs (no OCR needed)
 PyMuPDF==1.24.3           # Convert scanned PDF pages to images for OCR
 pytesseract==0.3.10       # OCR engine wrapper (needs tesseract-ocr — see packages.txt)
 Pillow==10.3.0            # Image processing
+requests==2.31.0          # For optional Google Cloud Vision OCR (handwriting)
 
 # Web app
 streamlit==1.33.0         # Web interface
