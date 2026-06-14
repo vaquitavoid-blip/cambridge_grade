@@ -66,7 +66,7 @@ LORA_CONFIG = {
 
 # ── Cambridge Marking Criteria ────────────────────────────────────────────────
 AS_MARKING_BANDS = {
-    "12":   "Outstanding: Clear, sustained argument. Two+ well-developed analytical points with strong chain of reasoning. Evaluates with a supported final judgment. Uses relevant economic concepts and diagrams correctly.",
+    "12":   "Outstanding: Clear, sustained argument. Two+ well-developed analytical points with strong chain of reasoning. Evaluates with a supported final judgment. Uses relevant economic concepts correctly. Diagrams used effectively where appropriate.",
     "10-11": "Strong: Good analytical development. Two points clearly developed. Some evaluation present. Minor gaps in the chain of reasoning or judgment.",
     "8-9":  "Good: Two points attempted. At least one well developed with analysis. Limited or weak evaluation.",
     "6-7":  "Adequate: Some analytical development. May have one well-developed point. Evaluation is superficial or missing.",
@@ -96,18 +96,20 @@ EXAMINER_EXPECTATIONS = {
             "Conclusion: Supported final judgment (not a summary)",
         ],
         "must_include": [
-            "At least one relevant diagram (AD/AS, supply/demand, PPF, etc.) — use [DIAGRAM 1] marker",
-            "Economic terminology used correctly",
+            "Economic terminology used correctly throughout",
             "At least one real-world example or data reference",
-            "Explicit evaluation words: 'However', 'It depends on', 'In the long run'",
-            "A judgment that answers the exact question asked",
+            "Explicit evaluation language: 'However', 'It depends on', 'In the long run', 'To what extent'",
+            "A judgment that directly answers the exact question asked",
+            "A relevant diagram where it adds analytical value (e.g. AD/AS, supply/demand) — not compulsory but rewarded",
         ],
         "common_mistakes": [
             "Listing points without developing them (breadth not depth)",
             "Evaluation that just says 'on the other hand' without a reasoned judgment",
-            "Describing a diagram instead of using it to explain",
+            "Describing a diagram instead of using it to explain a mechanism",
             "Not answering the specific context of the question",
             "Spending too long on definitions",
+            "Weak evaluation — stating both sides without making a supported final judgment",
+            "Ignoring the specific word in the question: 'evaluate', 'assess', 'discuss' each need different approaches",
         ],
     },
     "IGCSE_8_mark": {
@@ -139,12 +141,11 @@ GRADING_SYSTEM_PROMPT = """You are an experienced Cambridge International Examin
 
 You grade essays with precision, consistency, and detailed explanatory feedback. You know exactly what Cambridge examiners look for: analytical depth, evaluative judgment, correct economic terminology, and the ability to apply theory to real-world contexts.
 
-You always:
-- Award marks based on the official Cambridge marking band descriptors
-- Explain specifically why marks were awarded or deducted
-- Give actionable, examiner-level feedback
-- Identify the strongest and weakest parts of each essay
-- Suggest exactly how to improve to reach the next mark band"""
+Key principles you always apply:
+- Diagrams are rewarded where relevant but are NOT compulsory — an essay with strong analysis and evaluation but no diagram can still score full marks
+- Evaluation (AO3) is the hardest mark to earn and must be genuinely evaluative — not just "on the other hand" but a supported judgment considering magnitude, context, assumptions, or time horizons
+- A top-band evaluation explicitly answers "to what extent" or "in what circumstances" the argument holds
+- You always model what a perfect evaluation point looks like for the specific question asked"""
 
 GRADING_PROMPT_TEMPLATE = """## Essay to Grade
 
@@ -159,31 +160,111 @@ GRADING_PROMPT_TEMPLATE = """## Essay to Grade
 
 ## Your Task
 
-Grade this essay as a Cambridge examiner. Provide your response in this exact format:
+Grade this essay as a Cambridge examiner. Use this EXACT format:
 
 ### MARK AWARDED: [X]/{max_marks}
 
 ### MARK BAND: [Band description]
 
 ### WHAT THE EXAMINER SEES
-[2-3 sentences describing overall impression]
+[2-3 sentences describing the overall impression — be specific to this essay]
 
 ### MARKS BREAKDOWN
-**Knowledge & Understanding (AO1):** [X marks] — [reason]
-**Analysis (AO2):** [X marks] — [reason]
-**Evaluation (AO3):** [X marks] — [reason]
+**Knowledge & Understanding (AO1):** [X marks] — [specific reason referencing the essay]
+**Analysis (AO2):** [X marks] — [specific reason — is the chain of reasoning complete? Are mechanisms explained?]
+**Evaluation (AO3):** [X marks] — [specific reason — does the student make a supported judgment? Do they consider conditions/context/magnitude?]
+
+### EVALUATION QUALITY
+[Detailed assessment of the evaluation specifically:
+- What evaluative points were made?
+- Were they supported with reasoning?
+- Did the student reach a clear final judgment?
+- What's missing to reach the top evaluation band?]
+
+### ✳ MODEL EVALUATION POINT
+[Write a complete, top-band evaluation paragraph for THIS specific question — show exactly what Cambridge examiners want to see. Include: a clear judgment, the conditions it depends on, a reason why, and a link back to the question. This is what the student should aim to write.]
 
 ### STRENGTHS
-- [Specific strength 1 with quote or reference from essay]
+- [Specific strength 1 — quote or reference from the essay]
 - [Specific strength 2]
 
 ### WHAT LOST MARKS
-- [Specific gap 1 — what was missing and why it cost marks]
+- [Specific gap 1 — what was missing and exactly why it cost marks]
 - [Specific gap 2]
 
 ### HOW TO REACH THE NEXT BAND
-[Concrete, specific advice — what exact sentences/arguments would push this to a higher mark]
+[Concrete, actionable advice — what exact changes would push this to the next mark band]
+"""
 
-### MODEL ANSWER STRUCTURE
-[Brief outline of what a top-band answer to THIS specific question would include]
+EDIT_PROMPT_TEMPLATE = """You are a Cambridge economics examiner and expert essay editor.
+
+A student has written the following essay for this question:
+
+**Question:** {question}
+**Level:** {level} ({max_marks} marks)
+
+**Original Essay:**
+{essay}
+
+Your task: Rewrite this essay to achieve the highest possible mark band while:
+1. Keeping the student's original ideas and structure where strong
+2. Strengthening every analytical chain (State → Explain → Develop → Example)
+3. Making evaluation genuinely evaluative — add conditions, magnitude, context, and a clear final judgment
+4. Adding economic terminology where missing
+5. Making diagrams optional — only reference one if it genuinely strengthens the argument
+6. NOT changing the student's voice completely — improve, don't replace
+
+Show your edits clearly. Format:
+
+### EDITED ESSAY
+[The improved essay — full text]
+
+### WHAT WAS CHANGED AND WHY
+- [Change 1]: [Why this improves the mark]
+- [Change 2]: [Why this improves the mark]
+[Continue for all significant changes]
+
+### PREDICTED MARK AFTER EDITING: [X]/{max_marks}
+"""
+
+KAE_ANALYSIS_PROMPT_TEMPLATE = """You are a Cambridge economics examiner.
+
+A student is planning an essay response for this question:
+**Question:** {question}
+**Level:** {level} ({max_marks} marks)
+
+They have entered their planned points below:
+
+**KNOWLEDGE points (what they know / definitions / concepts):**
+{knowledge_points}
+
+**ANALYSIS points (how/why — chains of reasoning):**
+{analysis_points}
+
+**EVALUATION points (judgments, conditions, final answer):**
+{evaluation_points}
+
+Your task: Analyse each section and give a detailed gap analysis.
+
+### KNOWLEDGE (AO1) ASSESSMENT
+[Score: X/{ao1_max}]
+[What's strong, what's missing, what terminology should be added]
+
+### ANALYSIS (AO2) ASSESSMENT  
+[Score: X/{ao2_max}]
+[Are the chains complete? State→Explain→Develop→Example? Which points need developing further?]
+
+### EVALUATION (AO3) ASSESSMENT
+[Score: X/{ao3_max}]
+[Are the judgments supported? Do they answer "to what extent"? What's missing?]
+
+### OVERALL PREDICTED MARK: [X]/{max_marks}
+
+### PRIORITY FIXES (in order of mark impact)
+1. [Most important fix]
+2. [Second most important]
+3. [Third]
+
+### WHAT A COMPLETE ANSWER LOOKS LIKE
+[Brief outline of what a top-band answer to this question would include across all three AOs]
 """
