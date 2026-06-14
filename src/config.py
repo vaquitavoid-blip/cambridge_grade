@@ -77,12 +77,12 @@ AS_MARKING_BANDS = {
 }
 
 IGCSE_MARKING_BANDS = {
-    "8":   "Full marks: Two well-developed points with economic reasoning and real-world examples. Clear evaluation with supported judgment.",
-    "7":   "Strong: Two well-developed analytical points. Evaluation present but judgment may lack support.",
-    "5-6": "Good: Two points, at least one with development. Limited evaluation.",
-    "3-4": "Adequate: One well-developed point OR two basic points. Minimal evaluation.",
-    "1-2": "Weak: One basic point. Mostly definition-level. No analysis.",
-    "0":   "No relevant content.",
+    "8":   "Full marks: Two well-developed accepted points, each clearly explained with a relevant example. A brief evaluative comment present (1-2 sentences only). All content aligns with standard mark scheme accepted answers.",
+    "7":   "Strong: Two developed accepted points with explanation. Minor gap in example or evaluative comment.",
+    "5-6": "Good: Two accepted points, at least one developed with explanation and example. No evaluation required for this band.",
+    "3-4": "Adequate: One well-developed accepted point OR two basic accepted points. Minimal development.",
+    "1-2": "Weak: One basic accepted point. Definition-level only.",
+    "0":   "No relevant content, or all points fall outside accepted mark scheme answers.",
 }
 
 # ── Examiner Expectations ─────────────────────────────────────────────────────
@@ -108,93 +108,149 @@ EXAMINER_EXPECTATIONS = {
             "Describing a diagram instead of using it to explain a mechanism",
             "Not answering the specific context of the question",
             "Spending too long on definitions",
-            "Weak evaluation — stating both sides without making a supported final judgment",
-            "Ignoring the specific word in the question: 'evaluate', 'assess', 'discuss' each need different approaches",
+            "Weak evaluation — stating both sides without a supported final judgment",
         ],
     },
     "IGCSE_8_mark": {
         "structure": [
-            "Point 1: State the point clearly",
-            "Explain: Why/how does this happen? (economic logic)",
-            "Develop: What is the consequence? (chain of reasoning)",
-            "Example: Real-world evidence",
-            "Point 2: Repeat the above",
-            "Evaluation: Brief judgment on which effect is more significant and why",
+            "Point 1: State a clear accepted point (must align with mark scheme)",
+            "Explain: Simple, direct explanation of why/how — clarity rewarded over complexity",
+            "Example: A textbook or real-world example to illustrate the point",
+            "Point 2: Repeat for a second accepted point",
+            "Optional: 1-2 sentence evaluative comment (minor marks only)",
         ],
         "must_include": [
-            "Two distinct analytical points",
-            "Economic vocabulary (elasticity, incentive, opportunity cost, etc.)",
-            "At least one real-world example",
-            "A brief evaluative comment at the end",
+            "Two distinct points that match standard Cambridge IGCSE mark scheme accepted answers",
+            "Clear, simple explanation — examiners reward directness over sophistication",
+            "At least one example per point",
+            "Syllabus-level economic vocabulary (not AS-level concepts)",
         ],
         "common_mistakes": [
-            "Writing three or four shallow points instead of two deep ones",
-            "Forgetting the evaluation at the end",
-            "Using examples without linking them to economic theory",
-            "Repeating the question or writing a long introduction",
+            "Writing points NOT in the Cambridge mark scheme — original ideas score zero at IGCSE",
+            "Writing AS-level style deep evaluation — IGCSE barely rewards this",
+            "Three or four shallow points instead of two well-developed ones",
+            "Over-complicating explanations — keep it clear and direct",
+            "Using concepts beyond the IGCSE syllabus",
+            "Spending time on evaluation when content points are incomplete",
         ],
     },
 }
 
 # ── Prompt Templates ──────────────────────────────────────────────────────────
-GRADING_SYSTEM_PROMPT = """You are an experienced Cambridge International Examinations (CIE) economics examiner with 15+ years of experience marking AS Level and IGCSE Economics papers.
+GRADING_SYSTEM_PROMPT = """You are an experienced Cambridge International Examinations (CIE) economics examiner with 15+ years of experience marking both AS Level and IGCSE Economics papers.
 
-You grade essays with precision, consistency, and detailed explanatory feedback. You know exactly what Cambridge examiners look for: analytical depth, evaluative judgment, correct economic terminology, and the ability to apply theory to real-world contexts.
+You apply DIFFERENT standards depending on the level:
 
-Key principles you always apply:
-- Diagrams are rewarded where relevant but are NOT compulsory — an essay with strong analysis and evaluation but no diagram can still score full marks
-- Evaluation (AO3) is the hardest mark to earn and must be genuinely evaluative — not just "on the other hand" but a supported judgment considering magnitude, context, assumptions, or time horizons
-- A top-band evaluation explicitly answers "to what extent" or "in what circumstances" the argument holds
-- You always model what a perfect evaluation point looks like for the specific question asked"""
+FOR AS LEVEL (12-mark questions):
+- Evaluation (AO3) is critical and heavily weighted — must show supported judgment, consider conditions/magnitude/time horizons
+- "To what extent" and "it depends on..." with reasoning is expected
+- Analysis chains must be fully developed: State → Explain → Develop → Example
+- Original thought and independent reasoning is rewarded
+- Diagrams are useful but not compulsory
 
-GRADING_PROMPT_TEMPLATE = """## Essay to Grade
+FOR IGCSE (8-mark questions):
+- Content accuracy is paramount — points must match Cambridge mark scheme accepted answers
+- Original ideas NOT in the mark scheme score ZERO — creativity is penalised
+- Evaluation is barely weighted — 1-2 sentences at the end is sufficient, more is a waste of time
+- Clarity beats complexity — simple, direct explanations score better than sophisticated ones
+- Two well-developed accepted points with examples = near full marks
+- Syllabus-level vocabulary only — AS-level concepts are out of scope
 
-**Exam Level:** {level}
-**Question Type:** {question_type} ({max_marks} marks)
-**Question:** {question}
+You always model what a perfect answer looks like for the specific question asked."""
+
+
+AS_GRADING_TEMPLATE = """## AS Level Essay to Grade
+
+**Question (12 marks):** {question}
 
 **Student's Essay:**
 {essay}
 
 ---
 
-## Your Task
+Grade this AS Level essay. Use this EXACT format:
 
-Grade this essay as a Cambridge examiner. Use this EXACT format:
-
-### MARK AWARDED: [X]/{max_marks}
+### MARK AWARDED: [X]/12
 
 ### MARK BAND: [Band description]
 
 ### WHAT THE EXAMINER SEES
-[2-3 sentences describing the overall impression — be specific to this essay]
+[2-3 sentences — overall impression, specific to this essay]
 
 ### MARKS BREAKDOWN
-**Knowledge & Understanding (AO1):** [X marks] — [specific reason referencing the essay]
-**Analysis (AO2):** [X marks] — [specific reason — is the chain of reasoning complete? Are mechanisms explained?]
-**Evaluation (AO3):** [X marks] — [specific reason — does the student make a supported judgment? Do they consider conditions/context/magnitude?]
+**Knowledge & Understanding (AO1):** [X]/2 — [specific reason]
+**Analysis (AO2):** [X]/6 — [is the chain complete? State→Explain→Develop→Example? Are mechanisms clear?]
+**Evaluation (AO3):** [X]/4 — [does the student make a supported judgment? Do they consider conditions/context/magnitude/time horizons?]
 
 ### EVALUATION QUALITY
-[Detailed assessment of the evaluation specifically:
+[Assess the evaluation specifically:
 - What evaluative points were made?
-- Were they supported with reasoning?
-- Did the student reach a clear final judgment?
-- What's missing to reach the top evaluation band?]
+- Were they supported with reasoning or just asserted?
+- Did the student reach a clear final judgment that answers "to what extent"?
+- What is missing for top AO3 marks?]
 
 ### ✳ MODEL EVALUATION POINT
-[Write a complete, top-band evaluation paragraph for THIS specific question — show exactly what Cambridge examiners want to see. Include: a clear judgment, the conditions it depends on, a reason why, and a link back to the question. This is what the student should aim to write.]
+[Write a complete, top-band evaluation paragraph for THIS specific question. Include: a clear judgment, the conditions it depends on, the reasoning, and a direct link back to the question. Show exactly what Cambridge AS examiners want to see.]
 
 ### STRENGTHS
-- [Specific strength 1 — quote or reference from the essay]
+- [Specific strength from the essay]
 - [Specific strength 2]
 
 ### WHAT LOST MARKS
-- [Specific gap 1 — what was missing and exactly why it cost marks]
+- [Specific gap with reason]
 - [Specific gap 2]
 
 ### HOW TO REACH THE NEXT BAND
-[Concrete, actionable advice — what exact changes would push this to the next mark band]
+[Exact, actionable advice]
 """
+
+IGCSE_GRADING_TEMPLATE = """## IGCSE Essay to Grade
+
+**Question (8 marks):** {question}
+
+**Student's Essay:**
+{essay}
+
+---
+
+Grade this IGCSE essay. Remember: IGCSE rewards mark-scheme accuracy and clarity, NOT original thinking or deep evaluation.
+
+Use this EXACT format:
+
+### MARK AWARDED: [X]/8
+
+### MARK BAND: [Band description]
+
+### WHAT THE EXAMINER SEES
+[2-3 sentences — overall impression, specific to this essay]
+
+### MARKS BREAKDOWN
+**Content & Knowledge (AO1):** [X]/2 — [are the points accepted IGCSE mark scheme answers? Are they clearly stated?]
+**Development & Explanation (AO2):** [X]/4 — [are points explained clearly and simply? Is there an example? Is the explanation direct?]
+**Evaluative Comment (AO3):** [X]/2 — [brief evaluative comment present? 1-2 sentences is all that's needed at IGCSE]
+
+### CONTENT ACCURACY CHECK
+[Critical for IGCSE — state whether each point the student made is:
+✓ ACCEPTED — matches standard Cambridge IGCSE mark scheme answers
+✗ NOT ACCEPTED — original or off-syllabus point that scores zero
+Flag any points that would not appear in a Cambridge MS]
+
+### CLARITY ASSESSMENT
+[IGCSE rewards simple, direct explanations. Is the student's explanation clear and easy to follow? Or is it unnecessarily complex?]
+
+### ✳ WHAT A FULL-MARK ANSWER LOOKS LIKE
+[Write two accepted points with clear explanation and example, showing exactly what an 8/8 IGCSE response to this question would look like. Keep it simple and direct.]
+
+### WHAT LOST MARKS
+- [Specific gap — was it an off-MS point, unclear explanation, missing example?]
+- [Specific gap 2]
+
+### HOW TO REACH THE NEXT BAND
+[Simple, direct advice for IGCSE students — focus on accepted points and clarity]
+"""
+
+# Keep a single template reference for backwards compat — dynamically chosen in grader.py
+GRADING_PROMPT_TEMPLATE = AS_GRADING_TEMPLATE  # default; grader.py picks the right one
 
 EDIT_PROMPT_TEMPLATE = """You are a Cambridge economics examiner and expert essay editor.
 
@@ -206,15 +262,11 @@ A student has written the following essay for this question:
 **Original Essay:**
 {essay}
 
-Your task: Rewrite this essay to achieve the highest possible mark band while:
-1. Keeping the student's original ideas and structure where strong
-2. Strengthening every analytical chain (State → Explain → Develop → Example)
-3. Making evaluation genuinely evaluative — add conditions, magnitude, context, and a clear final judgment
-4. Adding economic terminology where missing
-5. Making diagrams optional — only reference one if it genuinely strengthens the argument
-6. NOT changing the student's voice completely — improve, don't replace
+Your task: Rewrite this essay to achieve the highest possible mark band.
 
-Show your edits clearly. Format:
+{level_specific_instructions}
+
+Format your response as:
 
 ### EDITED ESSAY
 [The improved essay — full text]
@@ -222,10 +274,25 @@ Show your edits clearly. Format:
 ### WHAT WAS CHANGED AND WHY
 - [Change 1]: [Why this improves the mark]
 - [Change 2]: [Why this improves the mark]
-[Continue for all significant changes]
 
 ### PREDICTED MARK AFTER EDITING: [X]/{max_marks}
 """
+
+AS_EDIT_INSTRUCTIONS = """For AS Level, focus on:
+1. Keeping the student's original ideas where strong
+2. Completing every analytical chain: State → Explain → Develop → Example
+3. Making evaluation genuinely evaluative — add conditions, magnitude, time horizons, and a clear final judgment
+4. Strengthening economic terminology
+5. Diagrams optional — only add reference if it genuinely strengthens the argument
+6. NOT replacing the student's voice entirely — improve, don't rewrite from scratch"""
+
+IGCSE_EDIT_INSTRUCTIONS = """For IGCSE, focus on:
+1. Ensuring both points match standard Cambridge mark scheme accepted answers — remove any original/off-syllabus points
+2. Making explanations simple and direct — clarity is rewarded over sophistication
+3. Adding a clear example for each point
+4. Keeping evaluation to 1-2 sentences only — do not add AS-level style evaluation
+5. Removing any concepts beyond the IGCSE syllabus
+6. Keeping language at IGCSE level throughout"""
 
 KAE_ANALYSIS_PROMPT_TEMPLATE = """You are a Cambridge economics examiner.
 

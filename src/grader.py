@@ -16,8 +16,9 @@ from rich.markdown import Markdown
 sys.path.append(str(Path(__file__).parent))
 from config import (
     BASE_MODEL_NAME, FINE_TUNED_MODEL_DIR,
-    GRADING_SYSTEM_PROMPT, GRADING_PROMPT_TEMPLATE,
-    EDIT_PROMPT_TEMPLATE, KAE_ANALYSIS_PROMPT_TEMPLATE,
+    GRADING_SYSTEM_PROMPT, AS_GRADING_TEMPLATE, IGCSE_GRADING_TEMPLATE,
+    EDIT_PROMPT_TEMPLATE, AS_EDIT_INSTRUCTIONS, IGCSE_EDIT_INSTRUCTIONS,
+    KAE_ANALYSIS_PROMPT_TEMPLATE,
 )
 
 console = Console()
@@ -90,12 +91,13 @@ class CambridgeGrader:
                 load_in_4bit=True,
                 bnb_4bit_quant_type="nf4",
                 bnb_4bit_compute_dtype=torch.bfloat16,
+                llm_int8_enable_fp32_cpu_offload=True,
             )
 
         return AutoModelForCausalLM.from_pretrained(
             model_name,
             quantization_config=quant_config,
-            device_map="auto" if self.device == "cuda" else None,
+            device_map="auto",
             torch_dtype=torch.bfloat16 if self.device == "cuda" else torch.float32,
             trust_remote_code=True,
         )
@@ -157,12 +159,10 @@ class CambridgeGrader:
         verbose:   bool = True,
     ) -> str:
         level         = level.upper()
+        template      = AS_GRADING_TEMPLATE if level == "AS" else IGCSE_GRADING_TEMPLATE
         question_type = "12-mark evaluate" if max_marks == 12 else "8-mark discuss"
 
-        user_prompt = GRADING_PROMPT_TEMPLATE.format(
-            level=level,
-            question_type=question_type,
-            max_marks=max_marks,
+        user_prompt = template.format(
             question=question,
             essay=essay,
         )
@@ -208,6 +208,7 @@ class CambridgeGrader:
             level=level.upper(),
             max_marks=max_marks,
             essay=essay,
+            level_specific_instructions=AS_EDIT_INSTRUCTIONS if level.upper() == "AS" else IGCSE_EDIT_INSTRUCTIONS,
         )
 
         return self._generate(GRADING_SYSTEM_PROMPT, user_prompt, max_new_tokens=1800)

@@ -70,18 +70,19 @@ def load_base_model():
 
     quant_config = BitsAndBytesConfig(
         load_in_4bit=True,
-        bnb_4bit_use_double_quant=True,     # saves ~0.4GB extra VRAM
+        bnb_4bit_use_double_quant=True,
         bnb_4bit_quant_type="nf4",
         bnb_4bit_compute_dtype=torch.bfloat16,
+        llm_int8_enable_fp32_cpu_offload=True,  # allows layers to spill to CPU safely
     )
 
     model = AutoModelForCausalLM.from_pretrained(
         BASE_MODEL_NAME,
         quantization_config=quant_config,
-        device_map="cuda:0",
+        device_map="auto",               # auto splits layers across GPU + CPU as needed
         trust_remote_code=True,
         torch_dtype=torch.bfloat16,
-        low_cpu_mem_usage=True,            # critical for 12GB RAM systems
+        low_cpu_mem_usage=True,
     )
 
     tokenizer = AutoTokenizer.from_pretrained(
