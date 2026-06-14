@@ -2,6 +2,13 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Converts raw essays + grades into the JSONL format needed for fine-tuning
 # Handles CSV, Excel, or individual .txt files
+#
+# CRITICAL: the assistant "target" text built here MUST use the exact same
+# section headings / format as get_grading_template(level) in config.py,
+# which is what grader.py uses at inference time and what grading_app.py
+# parses to render the UI. If these drift apart, the fine-tuned model
+# learns a format the UI can't parse — which is what was causing marks
+# not to display.
 # ─────────────────────────────────────────────────────────────────────────────
 
 import json
@@ -17,8 +24,8 @@ import sys
 sys.path.append(str(Path(__file__).parent))
 from config import (
     RAW_ESSAYS_DIR, PROCESSED_DIR, TRAINING_FILE, EVAL_FILE,
-    GRADING_SYSTEM_PROMPT, GRADING_PROMPT_TEMPLATE,
-    AS_MARKING_BANDS, IGCSE_MARKING_BANDS, EXAMINER_EXPECTATIONS
+    GRADING_SYSTEM_PROMPT, get_grading_template, format_marks_breakdown,
+    get_mark_band, AO_MARKS, EXAMINER_EXPECTATIONS,
 )
 
 console = Console()
@@ -39,7 +46,7 @@ class EssayEntry:
         max_marks: int,          # 12 for AS, 8 for IGCSE
         level: str,              # "AS" or "IGCSE"
         examiner_feedback: str,  # Real feedback if you have it
-        question_topic: str = ""
+        question_topic: str = "",
     ):
         self.question       = question.strip()
         self.essay          = essay.strip()
@@ -64,16 +71,7 @@ class EssayEntry:
 
     @property
     def mark_band(self):
-        bands = AS_MARKING_BANDS if self.level == "AS" else IGCSE_MARKING_BANDS
-        for band_range, description in bands.items():
-            if "-" in band_range:
-                low, high = map(int, band_range.split("-"))
-                if low <= self.mark <= high:
-                    return description
-            else:
-                if self.mark == int(band_range):
-                    return description
-        return "Unknown band"
+        return get_mark_band(self.level, self.mark)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -84,17 +82,19 @@ def build_training_sample(entry: EssayEntry) -> dict:
     """
     Converts one essay entry into a chat-format training sample.
     Format: system + user (question+essay) → assistant (grading response)
+
+    The user message uses get_grading_template(level), the SAME template
+    grader.py uses at inference — so AS essays are trained with the AS
+    template and IGCSE essays with the IGCSE template (previously both
+    used the AS template, which meant the fine-tuned model never learned
+    the IGCSE-specific section headings).
     """
-    user_message = GRADING_PROMPT_TEMPLATE.format(
-        level=entry.level,
-        question_type=entry.question_type,
-        max_marks=entry.max_marks,
+    template = get_grading_template(entry.level)
+    user_message = template.format(
         question=entry.question,
         essay=entry.essay,
     )
 
-    # Build the target assistant response from the real grade + feedback
-    # This is what the model learns to produce
     assistant_response = _build_target_response(entry)
 
     return {
@@ -109,14 +109,25 @@ def build_training_sample(entry: EssayEntry) -> dict:
 def _build_target_response(entry: EssayEntry) -> str:
     """
     Constructs the ideal grader response from known mark + feedback.
-    If you have real examiner feedback, it's used directly.
-    Otherwise, a structured template is generated from the mark band.
-    """
-    expectations = EXAMINER_EXPECTATIONS.get(
-        f"{'AS_12_mark' if entry.level == 'AS' else 'IGCSE_8_mark'}", {}
-    )
 
-    response = f"""### MARK AWARDED: {entry.mark}/{entry.max_marks}
+    The output sections and headings here MUST exactly match
+    AS_GRADING_TEMPLATE / IGCSE_GRADING_TEMPLATE in config.py, since this
+    is the text the model is trained to reproduce, and grading_app.py
+    parses output using these exact heading strings.
+    """
+    if entry.level == "AS":
+        return _build_as_target(entry)
+    return _build_igcse_target(entry)
+
+
+def _build_as_target(entry: EssayEntry) -> str:
+    expectations = EXAMINER_EXPECTATIONS.get("AS_12_mark", {})
+    ao1, ao2, ao3 = _ao_split(entry)
+    ao1_note, ao2_note, ao3_note = _as_ao_notes(entry, ao1, ao2, ao3)
+
+    strengths, weaknesses = _strengths_and_weaknesses(entry)
+
+    return f"""### MARK AWARDED: {entry.mark}/{entry.max_marks}
 
 ### MARK BAND: {entry.mark_band}
 
@@ -124,17 +135,65 @@ def _build_target_response(entry: EssayEntry) -> str:
 {entry.feedback if entry.feedback else _auto_impression(entry)}
 
 ### MARKS BREAKDOWN
-{_auto_breakdown(entry)}
+{format_marks_breakdown(entry.level, ao1, ao2, ao3, ao1_note, ao2_note, ao3_note)}
+
+### EVALUATION QUALITY
+{_auto_evaluation_quality(entry, ao3)}
+
+### MODEL EVALUATION POINT
+{_auto_model_eval_point(entry)}
+
+### STRENGTHS
+{strengths}
+
+### WHAT LOST MARKS
+{weaknesses}
 
 ### HOW TO REACH THE NEXT BAND
 {_auto_improvement(entry)}
+""".strip()
 
-### MODEL ANSWER STRUCTURE
-For this question, a top-band response would include:
-{chr(10).join(f'- {s}' for s in expectations.get('must_include', []))}
-"""
-    return response.strip()
 
+def _build_igcse_target(entry: EssayEntry) -> str:
+    ao1, ao2, ao3 = _ao_split(entry)
+    ao1_note, ao2_note, ao3_note = _igcse_ao_notes(entry, ao1, ao2, ao3)
+
+    strengths, weaknesses = _strengths_and_weaknesses(entry)
+
+    return f"""### MARK AWARDED: {entry.mark}/{entry.max_marks}
+
+### MARK BAND: {entry.mark_band}
+
+### WHAT THE EXAMINER SEES
+{entry.feedback if entry.feedback else _auto_impression(entry)}
+
+### MARKS BREAKDOWN
+{format_marks_breakdown(entry.level, ao1, ao2, ao3, ao1_note, ao2_note, ao3_note)}
+
+### CONTENT ACCURACY CHECK
+{_auto_content_accuracy(entry)}
+
+### CLARITY ASSESSMENT
+{_auto_clarity(entry)}
+
+### MODEL EVALUATION POINT
+{_auto_model_eval_point(entry)}
+
+### STRENGTHS
+{strengths}
+
+### WHAT LOST MARKS
+{weaknesses}
+
+### HOW TO REACH THE NEXT BAND
+{_auto_improvement(entry)}
+""".strip()
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# AUTO-GENERATED CONTENT HELPERS
+# Used when no real examiner feedback was provided for an essay.
+# ─────────────────────────────────────────────────────────────────────────────
 
 def _auto_impression(entry: EssayEntry) -> str:
     """Auto-generates an examiner impression based on mark."""
@@ -149,35 +208,159 @@ def _auto_impression(entry: EssayEntry) -> str:
         return "A weak response. Relevant points are present but undeveloped. The candidate relies on definitions and assertions without demonstrating analytical understanding."
 
 
-def _auto_breakdown(entry: EssayEntry) -> str:
-    """Distributes the total mark across AOs proportionally."""
+def _ao_split(entry: EssayEntry) -> tuple[int, int, int]:
+    """Distributes the total mark across AO1/AO2/AO3 proportionally."""
+    ao = AO_MARKS[entry.level]
     m = entry.mark
-    if entry.max_marks == 12:
-        # AS: AO1=2, AO2=6, AO3=4 (approx Cambridge weighting)
-        ao1 = min(2, round(m * 0.17))
-        ao3 = min(4, round(m * 0.33))
-        ao2 = m - ao1 - ao3
-        return (
-            f"**Knowledge & Understanding (AO1):** {ao1}/2 — "
-            f"{'Appropriate use of economic terminology and concepts.' if ao1 >= 2 else 'Limited use of economic vocabulary.'}\n"
-            f"**Analysis (AO2):** {ao2}/6 — "
-            f"{'Well-developed analytical chains with logical reasoning.' if ao2 >= 5 else 'Some analytical development but chains of reasoning incomplete.'}\n"
-            f"**Evaluation (AO3):** {ao3}/4 — "
-            f"{'Confident evaluative judgment with supporting reasoning.' if ao3 >= 3 else 'Evaluation is limited or unsupported by reasoning.'}"
+    if entry.level == "AS":
+        ao1 = min(ao["ao1"], round(m * 0.17))
+        ao3 = min(ao["ao3"], round(m * 0.33))
+        ao2 = max(0, m - ao1 - ao3)
+        # Clamp ao2 to its max in case rounding pushed it over
+        if ao2 > ao["ao2"]:
+            overflow = ao2 - ao["ao2"]
+            ao2 = ao["ao2"]
+            ao3 = min(ao["ao3"], ao3 + overflow)
+    else:
+        ao1 = min(ao["ao1"], round(m * 0.25))
+        ao3 = min(ao["ao3"], round(m * 0.25))
+        ao2 = max(0, m - ao1 - ao3)
+        if ao2 > ao["ao2"]:
+            overflow = ao2 - ao["ao2"]
+            ao2 = ao["ao2"]
+            ao1 = min(ao["ao1"], ao1 + overflow)
+
+    return ao1, ao2, ao3
+
+
+def _as_ao_notes(entry: EssayEntry, ao1: int, ao2: int, ao3: int) -> tuple[str, str, str]:
+    ao = AO_MARKS["AS"]
+    ao1_note = ("Appropriate use of economic terminology and concepts."
+                 if ao1 >= ao["ao1"] else "Limited use of economic vocabulary.")
+    ao2_note = ("Well-developed analytical chains with logical reasoning."
+                 if ao2 >= 5 else "Some analytical development but chains of reasoning incomplete.")
+    ao3_note = ("Confident evaluative judgment with supporting reasoning."
+                 if ao3 >= 3 else "Evaluation is limited or unsupported by reasoning.")
+    return ao1_note, ao2_note, ao3_note
+
+
+def _igcse_ao_notes(entry: EssayEntry, ao1: int, ao2: int, ao3: int) -> tuple[str, str, str]:
+    ao = AO_MARKS["IGCSE"]
+    ao1_note = ("Economic concepts used correctly."
+                 if ao1 >= ao["ao1"] else "Limited use of economic concepts.")
+    ao2_note = ("Good analytical development with reasoning chains."
+                 if ao2 >= 3 else "Analysis present but underdeveloped.")
+    ao3_note = ("Evaluation with a supported judgment."
+                 if ao3 >= ao["ao3"] else "Evaluation absent or unsupported.")
+    return ao1_note, ao2_note, ao3_note
+
+
+def _auto_evaluation_quality(entry: EssayEntry, ao3: int) -> str:
+    if ao3 >= 3:
+        return ("The essay engages in genuine evaluation — it weighs the question against "
+                "conditions such as time horizon, magnitude, or context, and reaches a "
+                "judgment that directly answers what was asked.")
+    elif ao3 >= 1:
+        return ("Some evaluative language is present (e.g. 'however', 'it depends'), but "
+                "the judgment is not fully supported by reasoning — the essay states both "
+                "sides without weighing them against each other or reaching a clear final "
+                "position tied to the specific question.")
+    else:
+        return ("Evaluation is largely absent. The essay presents analysis without "
+                "considering counter-arguments, conditions, or a final judgment that "
+                "answers 'to what extent'.")
+
+
+def _auto_content_accuracy(entry: EssayEntry) -> str:
+    if entry.mark >= entry.max_marks - 1:
+        return ("Both main points made align with standard Cambridge IGCSE mark scheme "
+                "accepted answers (ACCEPTED). No off-syllabus or original points were "
+                "identified that would not appear in a Cambridge mark scheme.")
+    elif entry.mark >= entry.max_marks * 0.5:
+        return ("At least one point made aligns with standard Cambridge IGCSE mark scheme "
+                "accepted answers (ACCEPTED). One or more points may be too vague, "
+                "incomplete, or borderline to be confidently marked as an accepted point — "
+                "these should be made more specific and tied to standard syllabus "
+                "terminology.")
+    else:
+        return ("The points made are too general, vague, or off-syllabus to be confidently "
+                "marked as ACCEPTED against a standard Cambridge IGCSE mark scheme. Focus "
+                "on stating clear, syllabus-level accepted points rather than broad or "
+                "original ideas.")
+
+
+def _auto_clarity(entry: EssayEntry) -> str:
+    if entry.mark >= entry.max_marks * 0.75:
+        return ("The explanation is clear, direct, and easy to follow — exactly what IGCSE "
+                "examiners reward. Each point is explained in simple terms without "
+                "unnecessary complexity.")
+    elif entry.mark >= entry.max_marks * 0.4:
+        return ("The explanation is mostly clear but could be more direct in places. "
+                "IGCSE rewards simple, plain explanations over sophisticated language — "
+                "aim for short, clear sentences that directly explain the mechanism.")
+    else:
+        return ("The explanation is unclear, overly brief, or overcomplicated. At IGCSE, "
+                "clarity is rewarded over sophistication — state the point plainly, "
+                "explain it in one or two simple sentences, then give an example.")
+
+
+def _auto_model_eval_point(entry: EssayEntry) -> str:
+    if entry.level == "AS":
+        return (f"For this question, a top-band evaluation would reach a clear judgment "
+                f"on the question asked, then immediately qualify it: 'However, the "
+                f"extent to which this holds depends on [a specific condition relevant "
+                f"to {entry.question_topic or 'this topic'} — e.g. the size of the "
+                f"output gap, time lags, or the elasticity of the relevant curves]. In "
+                f"the short run [X is more likely], whereas in the long run [Y becomes "
+                f"more significant]. On balance, [final supported judgment that directly "
+                f"answers the question].'")
+    else:
+        return ("A full-mark IGCSE response states two accepted points clearly, explains "
+                "each in one or two simple sentences using correct syllabus terminology, "
+                "and gives a real-world or textbook example for each — for instance, "
+                "'[Accepted point 1], because [simple explanation]. For example, "
+                "[example]. [Accepted point 2], because [simple explanation]. For "
+                "example, [example].' A single 1-2 sentence evaluative comment (e.g. "
+                "'However, this depends on...') is enough for the evaluation marks — "
+                "anything longer is not rewarded at IGCSE.")
+
+
+def _strengths_and_weaknesses(entry: EssayEntry) -> tuple[str, str]:
+    """Generates bullet-point STRENGTHS / WHAT LOST MARKS sections."""
+    ratio = entry.mark / entry.max_marks
+
+    if ratio >= 0.75:
+        strengths = (
+            "- Clear command of relevant economic concepts and terminology\n"
+            "- Points are developed with a logical chain of reasoning"
+        )
+        weaknesses = (
+            "- Minor refinements to the final judgment would secure full marks — "
+            "tie the conclusion even more explicitly back to the exact wording of "
+            "the question"
+        )
+    elif ratio >= 0.5:
+        strengths = (
+            "- At least one point is identified and explained correctly\n"
+            "- Relevant economic terminology is used"
+        )
+        weaknesses = (
+            "- Analytical chains are incomplete — points are stated but not fully "
+            "developed through to a real-world consequence or example\n"
+            "- Evaluation is underdeveloped or asserted without supporting reasoning"
         )
     else:
-        # IGCSE: simpler 2+4+2 split
-        ao1 = min(2, round(m * 0.25))
-        ao3 = min(2, round(m * 0.25))
-        ao2 = m - ao1 - ao3
-        return (
-            f"**Knowledge (AO1):** {ao1}/2 — "
-            f"{'Economic concepts used correctly.' if ao1 >= 2 else 'Limited use of economic concepts.'}\n"
-            f"**Analysis (AO2):** {ao2}/4 — "
-            f"{'Good analytical development with reasoning chains.' if ao2 >= 3 else 'Analysis present but underdeveloped.'}\n"
-            f"**Evaluation (AO3):** {ao3}/2 — "
-            f"{'Evaluation with a supported judgment.' if ao3 >= 2 else 'Evaluation absent or unsupported.'}"
+        strengths = (
+            "- Some relevant economic content is present\n"
+            "- The response attempts to address the question topic"
         )
+        weaknesses = (
+            "- Points are largely definitional and not developed into analysis\n"
+            "- No supported evaluative judgment is reached\n"
+            "- Missing real-world examples or data to support the argument"
+        )
+
+    return strengths, weaknesses
 
 
 def _auto_improvement(entry: EssayEntry) -> str:
@@ -185,14 +368,23 @@ def _auto_improvement(entry: EssayEntry) -> str:
     if entry.mark >= entry.max_marks - 1:
         return "This is already near the top band. To consistently achieve full marks, ensure your concluding judgment is explicitly tied to the context of the question, not a generic statement."
     elif entry.mark >= entry.max_marks * 0.6:
-        return ("To reach the next band: (1) Develop your evaluation beyond 'it depends' — state specifically WHAT it depends on and WHY. "
-                "(2) Ensure each analytical point has a full chain: cause → mechanism → consequence → real-world example. "
-                "(3) Use a diagram and explicitly explain what it shows rather than just labelling it.")
+        if entry.level == "AS":
+            return ("To reach the next band: (1) Develop your evaluation beyond 'it depends' — state specifically WHAT it depends on and WHY. "
+                    "(2) Ensure each analytical point has a full chain: cause → mechanism → consequence → real-world example. "
+                    "(3) Use a diagram and explicitly explain what it shows rather than just labelling it.")
+        return ("To reach the next band: (1) Make sure both points are clearly accepted Cambridge IGCSE mark scheme answers. "
+                "(2) Add a real-world or textbook example for each point. "
+                "(3) Keep your evaluative comment brief — 1-2 sentences is enough.")
     else:
-        return ("To reach the next band: (1) Pick TWO points only and develop each one fully rather than listing many shallow points. "
-                "(2) For each point, ask yourself: 'Why does this happen? What is the economic mechanism? What would happen next?' "
-                "(3) Add at least one real-world example (a country, a policy, a statistic). "
-                "(4) Finish with a sentence that directly answers the question asked.")
+        if entry.level == "AS":
+            return ("To reach the next band: (1) Pick TWO points only and develop each one fully rather than listing many shallow points. "
+                    "(2) For each point, ask yourself: 'Why does this happen? What is the economic mechanism? What would happen next?' "
+                    "(3) Add at least one real-world example (a country, a policy, a statistic). "
+                    "(4) Finish with a sentence that directly answers the question asked.")
+        return ("To reach the next band: (1) Make sure you state TWO accepted points — check they would appear in a Cambridge mark scheme. "
+                "(2) Explain each point simply in one or two sentences — avoid AS-level complexity. "
+                "(3) Add a clear example for each point. "
+                "(4) Add one short evaluative sentence at the end.")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -235,8 +427,8 @@ def load_from_csv(filepath: str) -> list[EssayEntry]:
                 mark=int(row["mark"]),
                 max_marks=int(row["max_marks"]),
                 level=str(row["level"]),
-                examiner_feedback=str(row.get("feedback", "")),
-                question_topic=str(row.get("topic", "")),
+                examiner_feedback=str(row.get("feedback", "")) if pd.notna(row.get("feedback", "")) else "",
+                question_topic=str(row.get("topic", "")) if pd.notna(row.get("topic", "")) else "",
             )
             entries.append(entry)
         except Exception as e:
@@ -298,17 +490,39 @@ def build_dataset(entries: list[EssayEntry], eval_split: float = 0.15):
     """
     Converts essay entries to training + eval JSONL files.
     - 85% goes to training, 15% to evaluation by default
+
+    With very small datasets (e.g. 20 essays -> 3 eval samples), the eval
+    split can end up with zero essays of one level, which makes
+    evaluate_model.py's "extract_max_marks_from_sample" guess wrong. We
+    stratify by level so both AS and IGCSE are represented in eval whenever
+    enough essays of that level exist.
     """
     if len(entries) < 5:
         console.print("[red]⚠ You need at least 5 essays to build a dataset.[/red]")
         return
 
     random.seed(42)
-    random.shuffle(entries)
 
-    split_idx  = max(1, int(len(entries) * (1 - eval_split)))
-    train_set  = entries[:split_idx]
-    eval_set   = entries[split_idx:]
+    as_entries    = [e for e in entries if e.level == "AS"]
+    igcse_entries = [e for e in entries if e.level == "IGCSE"]
+    random.shuffle(as_entries)
+    random.shuffle(igcse_entries)
+
+    train_set: list[EssayEntry] = []
+    eval_set:  list[EssayEntry] = []
+
+    for subset in (as_entries, igcse_entries):
+        if not subset:
+            continue
+        split_idx = max(1, int(len(subset) * (1 - eval_split))) if len(subset) > 1 else 1
+        # Ensure at least 1 eval sample if we have 3+ of this level
+        if len(subset) >= 3 and split_idx == len(subset):
+            split_idx = len(subset) - 1
+        train_set.extend(subset[:split_idx])
+        eval_set.extend(subset[split_idx:])
+
+    random.shuffle(train_set)
+    random.shuffle(eval_set)
 
     _write_jsonl(train_set, TRAINING_FILE)
     _write_jsonl(eval_set,  EVAL_FILE)
@@ -328,6 +542,13 @@ def build_dataset(entries: list[EssayEntry], eval_split: float = 0.15):
     console.print(table)
     console.print(f"\n[green]✓ Training data saved to:   {TRAINING_FILE}[/green]")
     console.print(f"[green]✓ Evaluation data saved to: {EVAL_FILE}[/green]")
+
+    if len(eval_set) == 0:
+        console.print(
+            "[yellow]⚠ No essays were placed in the evaluation set — "
+            "evaluate_model.py will have nothing to evaluate. Add a few "
+            "more essays so each level has at least 3.[/yellow]"
+        )
 
 
 def _write_jsonl(entries: list[EssayEntry], output_path: Path):

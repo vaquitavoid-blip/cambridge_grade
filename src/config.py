@@ -33,6 +33,19 @@ for d in [RAW_ESSAYS_DIR, PROCESSED_DIR, MODELS_DIR]:
 BASE_MODEL_NAME      = "Qwen/Qwen2.5-1.5B-Instruct"
 FINE_TUNED_MODEL_DIR = MODELS_DIR / "cambridge_grader_v1"
 
+# ── Sequence length ───────────────────────────────────────────────────────────
+# IMPORTANT: a full AS essay (400-600 words ~ 550-800 tokens) + the grading
+# template + system prompt easily exceeds 1024 tokens. If the prompt is
+# truncated to 1024 at inference, the END of the essay (often the
+# conclusion/evaluation) gets cut off before the model ever sees it, which
+# leads to incomplete/garbled grading output that the UI then fails to parse.
+#
+# 2048 fits comfortably on 4GB VRAM with 4-bit quantization + LoRA r=8 for
+# this 1.5B model. This value is used for BOTH training (max_seq_length) and
+# inference (tokenizer truncation) so the model is never asked to handle
+# inputs longer than it was trained on.
+MAX_SEQ_LENGTH = 2048
+
 # ── Training Hyperparameters — tuned for RTX 2050 4GB VRAM ──────────────────
 TRAINING_CONFIG = {
     "num_train_epochs":              3,
@@ -41,7 +54,7 @@ TRAINING_CONFIG = {
     "learning_rate":                 2e-4,
     "warmup_ratio":                  0.05,
     "lr_scheduler_type":             "cosine",
-    "max_seq_length":                1024,   # reduced from 2048 to fit VRAM
+    "max_seq_length":                MAX_SEQ_LENGTH,
     "save_steps":                    50,
     "logging_steps":                 5,
     "eval_steps":                    50,
@@ -64,6 +77,32 @@ LORA_CONFIG = {
     "task_type":      "CAUSAL_LM",
 }
 
+# ── AO mark allocations by level ──────────────────────────────────────────────
+# Single source of truth — used by grader.py, data_prep.py, grading_app.py,
+# evaluate_model.py and run_grader.py so the AO split can never drift between
+# training data, prompts, and the UI.
+AO_MARKS = {
+    "AS":    {"ao1": 2, "ao2": 6, "ao3": 4, "total": 12},
+    "IGCSE": {"ao1": 2, "ao2": 4, "ao3": 2, "total": 8},
+}
+
+# Display labels for each AO, per level — also the single source of truth
+# for the headings the model is trained to produce AND the headings
+# grading_app.py searches for. Keeping these identical end-to-end is what
+# makes the marks breakdown reliably parseable.
+AO_LABELS = {
+    "AS": {
+        "ao1": "Knowledge & Understanding (AO1)",
+        "ao2": "Analysis (AO2)",
+        "ao3": "Evaluation (AO3)",
+    },
+    "IGCSE": {
+        "ao1": "Content & Knowledge (AO1)",
+        "ao2": "Development & Explanation (AO2)",
+        "ao3": "Evaluative Comment (AO3)",
+    },
+}
+
 # ── Cambridge Marking Criteria ────────────────────────────────────────────────
 AS_MARKING_BANDS = {
     "12":   "Outstanding: Clear, sustained argument. Two+ well-developed analytical points with strong chain of reasoning. Evaluates with a supported final judgment. Uses relevant economic concepts correctly. Diagrams used effectively where appropriate.",
@@ -84,6 +123,77 @@ IGCSE_MARKING_BANDS = {
     "1-2": "Weak: One basic accepted point. Definition-level only.",
     "0":   "No relevant content, or all points fall outside accepted mark scheme answers.",
 }
+
+# ── IGCSE Mark Scheme Bank ─────────────────────────────────────────────────────
+# Cambridge IGCSE Economics rewards points that match standard mark-scheme
+# "accepted answers" almost exclusively. This bank gives the grader (and the
+# content validator / feedback engine) a structured reference of commonly
+# accepted points by topic, so IGCSE feedback can say WHICH accepted points
+# were hit and which were missed — not just "looks economics-y".
+#
+# This is a starting reference set covering core IGCSE syllabus topics.
+# It is intentionally generic (not transcribed from any specific past paper)
+# — extend it with topic/question-specific accepted points as real mark
+# schemes are added (see scripts/add_essay.py "topic" field).
+IGCSE_MARK_SCHEME_BANK = {
+    "Price System": {
+        "accepted_points": [
+            "Price acts as a signal/incentive to producers and consumers",
+            "Price mechanism allocates scarce resources between competing uses",
+            "Changes in demand/supply cause price to adjust towards equilibrium",
+            "Shortages cause prices to rise; surpluses cause prices to fall",
+        ],
+        "common_examples": ["food prices", "fuel/oil prices", "housing market"],
+    },
+    "Market Failure": {
+        "accepted_points": [
+            "Externalities — third parties affected without compensation (positive/negative)",
+            "Public goods are non-excludable and non-rivalrous, leading to under-provision",
+            "Merit goods are under-consumed due to imperfect information",
+            "Demerit goods are over-consumed due to imperfect information",
+            "Government intervention: taxation, subsidies, regulation, provision of public goods",
+        ],
+        "common_examples": ["pollution from factories", "education", "healthcare", "smoking/alcohol taxes"],
+    },
+    "Microeconomics": {
+        "accepted_points": [
+            "Opportunity cost — the next best alternative forgone",
+            "Division of labour increases productivity through specialisation",
+            "Economies of scale lower average costs of production as output rises",
+            "Firms may aim for profit maximisation, growth, or market share",
+        ],
+        "common_examples": ["car manufacturing", "small vs large firms", "supermarkets"],
+    },
+    "Macroeconomics": {
+        "accepted_points": [
+            "Inflation reduces purchasing power and erodes savings",
+            "Unemployment leads to lost output and lower government tax revenue",
+            "Economic growth increases living standards via higher real GDP",
+            "Fiscal policy: government spending and taxation to manage the economy",
+            "Monetary policy: changing interest rates to influence borrowing/spending",
+        ],
+        "common_examples": ["interest rate changes", "government spending on infrastructure", "income tax changes"],
+    },
+    "International Economics": {
+        "accepted_points": [
+            "Specialisation and trade allow countries to consume beyond domestic production possibilities",
+            "Tariffs/quotas protect domestic industries but raise prices for consumers",
+            "A weaker exchange rate makes exports cheaper and imports more expensive",
+            "A current account deficit means imports of goods/services exceed exports",
+        ],
+        "common_examples": ["import tariffs on steel", "exchange rate depreciation", "trade between developed/developing countries"],
+    },
+    "Development Economics": {
+        "accepted_points": [
+            "Developing countries often have lower GDP per capita and living standards",
+            "Indicators of development: GDP per capita, literacy rate, life expectancy, HDI",
+            "Barriers to development: lack of infrastructure, education, capital, debt",
+            "Foreign direct investment can boost growth but profits may leave the country",
+        ],
+        "common_examples": ["sub-Saharan African economies", "remittances", "aid programmes"],
+    },
+}
+
 
 # ── Examiner Expectations ─────────────────────────────────────────────────────
 EXAMINER_EXPECTATIONS = {
@@ -156,7 +266,7 @@ FOR IGCSE (8-mark questions):
 - Two well-developed accepted points with examples = near full marks
 - Syllabus-level vocabulary only — AS-level concepts are out of scope
 
-You always model what a perfect answer looks like for the specific question asked."""
+You ALWAYS award a specific numeric mark — never a placeholder, range, or "X". You always model what a perfect answer looks like for the specific question asked."""
 
 
 AS_GRADING_TEMPLATE = """## AS Level Essay to Grade
@@ -168,40 +278,41 @@ AS_GRADING_TEMPLATE = """## AS Level Essay to Grade
 
 ---
 
-Grade this AS Level essay. Use this EXACT format:
+Grade this AS Level essay. Use this EXACT format. Replace every bracketed
+placeholder with real content — marks must be actual numbers, never "X".
 
-### MARK AWARDED: [X]/12
+### MARK AWARDED: <number>/12
 
-### MARK BAND: [Band description]
+### MARK BAND: <band description>
 
 ### WHAT THE EXAMINER SEES
-[2-3 sentences — overall impression, specific to this essay]
+<2-3 sentences — overall impression, specific to this essay>
 
 ### MARKS BREAKDOWN
-**Knowledge & Understanding (AO1):** [X]/2 — [specific reason]
-**Analysis (AO2):** [X]/6 — [is the chain complete? State→Explain→Develop→Example? Are mechanisms clear?]
-**Evaluation (AO3):** [X]/4 — [does the student make a supported judgment? Do they consider conditions/context/magnitude/time horizons?]
+**Knowledge & Understanding (AO1):** <number>/2 — <specific reason>
+**Analysis (AO2):** <number>/6 — <is the chain complete? State→Explain→Develop→Example? Are mechanisms clear?>
+**Evaluation (AO3):** <number>/4 — <does the student make a supported judgment? Do they consider conditions/context/magnitude/time horizons?>
 
 ### EVALUATION QUALITY
-[Assess the evaluation specifically:
+<Assess the evaluation specifically:
 - What evaluative points were made?
 - Were they supported with reasoning or just asserted?
 - Did the student reach a clear final judgment that answers "to what extent"?
-- What is missing for top AO3 marks?]
+- What is missing for top AO3 marks?>
 
-### ✳ MODEL EVALUATION POINT
-[Write a complete, top-band evaluation paragraph for THIS specific question. Include: a clear judgment, the conditions it depends on, the reasoning, and a direct link back to the question. Show exactly what Cambridge AS examiners want to see.]
+### MODEL EVALUATION POINT
+<Write a complete, top-band evaluation paragraph for THIS specific question. Include: a clear judgment, the conditions it depends on, the reasoning, and a direct link back to the question. Show exactly what Cambridge AS examiners want to see.>
 
 ### STRENGTHS
-- [Specific strength from the essay]
-- [Specific strength 2]
+- <specific strength from the essay>
+- <specific strength 2>
 
 ### WHAT LOST MARKS
-- [Specific gap with reason]
-- [Specific gap 2]
+- <specific gap with reason>
+- <specific gap 2>
 
 ### HOW TO REACH THE NEXT BAND
-[Exact, actionable advice]
+<exact, actionable advice>
 """
 
 IGCSE_GRADING_TEMPLATE = """## IGCSE Essay to Grade
@@ -215,42 +326,64 @@ IGCSE_GRADING_TEMPLATE = """## IGCSE Essay to Grade
 
 Grade this IGCSE essay. Remember: IGCSE rewards mark-scheme accuracy and clarity, NOT original thinking or deep evaluation.
 
-Use this EXACT format:
+Use this EXACT format. Replace every bracketed placeholder with real content
+— marks must be actual numbers, never "X".
 
-### MARK AWARDED: [X]/8
+### MARK AWARDED: <number>/8
 
-### MARK BAND: [Band description]
+### MARK BAND: <band description>
 
 ### WHAT THE EXAMINER SEES
-[2-3 sentences — overall impression, specific to this essay]
+<2-3 sentences — overall impression, specific to this essay>
 
 ### MARKS BREAKDOWN
-**Content & Knowledge (AO1):** [X]/2 — [are the points accepted IGCSE mark scheme answers? Are they clearly stated?]
-**Development & Explanation (AO2):** [X]/4 — [are points explained clearly and simply? Is there an example? Is the explanation direct?]
-**Evaluative Comment (AO3):** [X]/2 — [brief evaluative comment present? 1-2 sentences is all that's needed at IGCSE]
+**Content & Knowledge (AO1):** <number>/2 — <are the points accepted IGCSE mark scheme answers? Are they clearly stated?>
+**Development & Explanation (AO2):** <number>/4 — <are points explained clearly and simply? Is there an example? Is the explanation direct?>
+**Evaluative Comment (AO3):** <number>/2 — <brief evaluative comment present? 1-2 sentences is all that's needed at IGCSE>
 
 ### CONTENT ACCURACY CHECK
-[Critical for IGCSE — state whether each point the student made is:
-✓ ACCEPTED — matches standard Cambridge IGCSE mark scheme answers
-✗ NOT ACCEPTED — original or off-syllabus point that scores zero
-Flag any points that would not appear in a Cambridge MS]
+<Critical for IGCSE — state whether each point the student made is:
+ACCEPTED — matches standard Cambridge IGCSE mark scheme answers
+NOT ACCEPTED — original or off-syllabus point that scores zero
+Flag any points that would not appear in a Cambridge MS>
 
 ### CLARITY ASSESSMENT
-[IGCSE rewards simple, direct explanations. Is the student's explanation clear and easy to follow? Or is it unnecessarily complex?]
+<IGCSE rewards simple, direct explanations. Is the student's explanation clear and easy to follow? Or is it unnecessarily complex?>
 
-### ✳ WHAT A FULL-MARK ANSWER LOOKS LIKE
-[Write two accepted points with clear explanation and example, showing exactly what an 8/8 IGCSE response to this question would look like. Keep it simple and direct.]
+### MODEL EVALUATION POINT
+<Write two accepted points with clear explanation and example, showing exactly what an 8/8 IGCSE response to this question would look like. Keep it simple and direct.>
+
+### STRENGTHS
+- <specific strength from the essay>
+- <specific strength 2>
 
 ### WHAT LOST MARKS
-- [Specific gap — was it an off-MS point, unclear explanation, missing example?]
-- [Specific gap 2]
+- <specific gap — was it an off-MS point, unclear explanation, missing example?>
+- <specific gap 2>
 
 ### HOW TO REACH THE NEXT BAND
-[Simple, direct advice for IGCSE students — focus on accepted points and clarity]
+<simple, direct advice for IGCSE students — focus on accepted points and clarity>
 """
 
-# Keep a single template reference for backwards compat — dynamically chosen in grader.py
-GRADING_PROMPT_TEMPLATE = AS_GRADING_TEMPLATE  # default; grader.py picks the right one
+GRADING_TEMPLATES = {
+    "AS":    AS_GRADING_TEMPLATE,
+    "IGCSE": IGCSE_GRADING_TEMPLATE,
+}
+
+
+def get_grading_template(level: str) -> str:
+    """Returns the correct grading template for a level ('AS' or 'IGCSE').
+
+    This is the SINGLE place that decides which template is used — both
+    data_prep.py (when building training samples) and grader.py (at
+    inference) call this, so the model is always trained and queried with
+    the exact same prompt structure per level.
+    """
+    return GRADING_TEMPLATES.get(level.upper(), AS_GRADING_TEMPLATE)
+
+
+# Backwards-compat alias (older scripts referenced this name)
+GRADING_PROMPT_TEMPLATE = AS_GRADING_TEMPLATE
 
 EDIT_PROMPT_TEMPLATE = """You are a Cambridge economics examiner and expert essay editor.
 
@@ -269,13 +402,13 @@ Your task: Rewrite this essay to achieve the highest possible mark band.
 Format your response as:
 
 ### EDITED ESSAY
-[The improved essay — full text]
+<the improved essay — full text>
 
 ### WHAT WAS CHANGED AND WHY
-- [Change 1]: [Why this improves the mark]
-- [Change 2]: [Why this improves the mark]
+- <change 1>: <why this improves the mark>
+- <change 2>: <why this improves the mark>
 
-### PREDICTED MARK AFTER EDITING: [X]/{max_marks}
+### PREDICTED MARK AFTER EDITING: <number>/{max_marks}
 """
 
 AS_EDIT_INSTRUCTIONS = """For AS Level, focus on:
@@ -311,27 +444,72 @@ They have entered their planned points below:
 **EVALUATION points (judgments, conditions, final answer):**
 {evaluation_points}
 
-Your task: Analyse each section and give a detailed gap analysis.
+Your task: Analyse each section and give a detailed gap analysis. Replace
+every bracketed placeholder with a real number — never "X".
 
 ### KNOWLEDGE (AO1) ASSESSMENT
-[Score: X/{ao1_max}]
-[What's strong, what's missing, what terminology should be added]
+Score: <number>/{ao1_max}
+<What's strong, what's missing, what terminology should be added>
 
-### ANALYSIS (AO2) ASSESSMENT  
-[Score: X/{ao2_max}]
-[Are the chains complete? State→Explain→Develop→Example? Which points need developing further?]
+### ANALYSIS (AO2) ASSESSMENT
+Score: <number>/{ao2_max}
+<Are the chains complete? State→Explain→Develop→Example? Which points need developing further?>
 
 ### EVALUATION (AO3) ASSESSMENT
-[Score: X/{ao3_max}]
-[Are the judgments supported? Do they answer "to what extent"? What's missing?]
+Score: <number>/{ao3_max}
+<Are the judgments supported? Do they answer "to what extent"? What's missing?>
 
-### OVERALL PREDICTED MARK: [X]/{max_marks}
+### OVERALL PREDICTED MARK: <number>/{max_marks}
 
 ### PRIORITY FIXES (in order of mark impact)
-1. [Most important fix]
-2. [Second most important]
-3. [Third]
+1. <most important fix>
+2. <second most important>
+3. <third>
 
 ### WHAT A COMPLETE ANSWER LOOKS LIKE
-[Brief outline of what a top-band answer to this question would include across all three AOs]
+<Brief outline of what a top-band answer to this question would include across all three AOs>
 """
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SHARED FORMATTING HELPERS
+# Used by BOTH data_prep.py (to build training targets) and grading_app.py
+# (to render the UI). Keeping the exact wording/heading text identical
+# between training and inference is what makes the model's output reliably
+# parseable by the UI.
+# ─────────────────────────────────────────────────────────────────────────────
+
+def format_marks_breakdown(level: str, ao1: int, ao2: int, ao3: int,
+                            ao1_note: str = "", ao2_note: str = "", ao3_note: str = "") -> str:
+    """Builds the '### MARKS BREAKDOWN' body text for a given level and AO marks.
+
+    Produces lines in the exact form:
+        **<AO Label>:** <mark>/<max> — <note>
+    which is the same form the model is trained to produce, and the same
+    form grading_app.py's regex looks for.
+    """
+    level = level.upper()
+    ao = AO_MARKS.get(level, AO_MARKS["AS"])
+    labels = AO_LABELS.get(level, AO_LABELS["AS"])
+
+    lines = []
+    for key, value, note in [("ao1", ao1, ao1_note), ("ao2", ao2, ao2_note), ("ao3", ao3, ao3_note)]:
+        line = f"**{labels[key]}:** {value}/{ao[key]}"
+        if note:
+            line += f" — {note}"
+        lines.append(line)
+    return "\n".join(lines)
+
+
+def get_mark_band(level: str, mark: int) -> str:
+    """Returns the marking-band description for a given level and mark."""
+    bands = AS_MARKING_BANDS if level.upper() == "AS" else IGCSE_MARKING_BANDS
+    for band_range, description in bands.items():
+        if "-" in band_range:
+            low, high = map(int, band_range.split("-"))
+            if low <= mark <= high:
+                return description
+        else:
+            if mark == int(band_range):
+                return description
+    return "Unknown band"
