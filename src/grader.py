@@ -113,7 +113,7 @@ class CambridgeGrader:
     # SHARED INFERENCE
     # ─────────────────────────────────────────────────────────────────────────
 
-    def _generate(self, system_prompt: str, user_prompt: str, max_new_tokens: int = 1200) -> str:
+    def _generate(self, system_prompt: str, user_prompt: str, max_new_tokens: int = 600) -> str:
         messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user",   "content": user_prompt},
@@ -129,8 +129,12 @@ class CambridgeGrader:
             input_text,
             return_tensors="pt",
             truncation=True,
-            max_length=2048,
-        ).to(self.device)
+            max_length=1024,   # reduced from 2048
+        )
+
+        # Move inputs to the same device as the first model parameter
+        first_device = next(self.model.parameters()).device
+        inputs = {k: v.to(first_device) for k, v in inputs.items()}
 
         with torch.no_grad():
             outputs = self.model.generate(
@@ -170,7 +174,7 @@ class CambridgeGrader:
         if verbose:
             console.print("[cyan]Grading essay...[/cyan]")
 
-        return self._generate(GRADING_SYSTEM_PROMPT, user_prompt, max_new_tokens=1400)
+        return self._generate(GRADING_SYSTEM_PROMPT, user_prompt, max_new_tokens=600)
 
     def grade_and_display(self, question: str, essay: str, level: str = "AS", max_marks: int = 12) -> str:
         result = self.grade(question, essay, level, max_marks)
@@ -211,7 +215,7 @@ class CambridgeGrader:
             level_specific_instructions=AS_EDIT_INSTRUCTIONS if level.upper() == "AS" else IGCSE_EDIT_INSTRUCTIONS,
         )
 
-        return self._generate(GRADING_SYSTEM_PROMPT, user_prompt, max_new_tokens=1800)
+        return self._generate(GRADING_SYSTEM_PROMPT, user_prompt, max_new_tokens=800)
 
     def edit_and_display(self, question: str, essay: str, level: str = "AS", max_marks: int = 12) -> str:
         result = self.edit_essay(question, essay, level, max_marks)
@@ -259,7 +263,7 @@ class CambridgeGrader:
             ao3_max=ao["ao3"],
         )
 
-        return self._generate(GRADING_SYSTEM_PROMPT, user_prompt, max_new_tokens=1200)
+        return self._generate(GRADING_SYSTEM_PROMPT, user_prompt, max_new_tokens=600)
 
     def kae_and_display(
         self,
