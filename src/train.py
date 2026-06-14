@@ -186,7 +186,7 @@ def train(model, tokenizer, train_dataset, eval_dataset):
         lr_scheduler_type=cfg["lr_scheduler_type"],
         save_steps=cfg["save_steps"],
         logging_steps=cfg["logging_steps"],
-        eval_strategy="steps" if eval_dataset else "no",
+        evaluation_strategy="steps" if eval_dataset else "no",
         eval_steps=cfg["eval_steps"] if eval_dataset else None,
         load_best_model_at_end=cfg["load_best_model_at_end"] if eval_dataset else False,
         fp16=cfg["fp16"],
