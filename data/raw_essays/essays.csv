@@ -1,4 +1,4 @@
-question,essay,mark,max_marks,level,feedback,topic,date_added
+question,essay,mark,max_marks,level,feedback,topic,date_added,source
 Discuss usefulness of YED to both producer and government,"YED is the responsiveness of quantity demanded to a change in income. YED less than 0 Indicates an inferior good, YED form 0 to 1 Indicates a normal good and YED greater than 1 Indicates a luxury good.
 
 YED can help producers in production planning, investment decisions and stock management of products during different stages of the economic cycle. During economic growth, production is high, resulting in more revenue, and higher revenue results in higher wages and income. Higher income results in more spending, and knowing YED can help firms on whether they should increase supply, reduce supply, or switch product manufacture. For example, during economic growth, luxury firms such as Dior may have higher quantity demanded, so they price the goods at higher rates or they may increase supply.
@@ -12,7 +12,7 @@ YED can also help governments decide where support may be needed. During a reces
 But, YED cannot fully help the government understand struggling industries. They may also have to take in factors like unemployment rates, revenue generated in financial quarters and also revenues. While government support is an option, budget constraints exist. Therefore, the government cannot always support industries, as they have to focus on other aspects of the economy such as education and healthcare.For example, the UK government did not continue large-scale support for its coal mining industry despite falling demand, as public funds were needed for other priorities such as healthcare and education.
 In addition, YED can help governments anticipate macroeconomic changes. If many goods have a high positive YED, rising incomes may cause consumer spending and aggregate demand to increase rapidly. This could contribute to demand-pull inflation. As a result, governments may introduce contractionary fiscal policies, such as higher taxes or lower government spending, to reduce inflationary pressures.
 However, the usefulness of YED is limited. YED values are estimates based on past data and may change over time. Furthermore, YED only considers changes in average income and does not account for income inequality. An increase in national income may be concentrated among higher-income households, meaning that actual changes in demand may differ from those predicted by YED.
-In conclusion, YED is useful to both producers and governments because it helps predict how demand will change as incomes change. However, its usefulness is limited as it is only an estimate and does not account for all factors affecting demand. Overall, YED may be more useful to governments as it assists with taxation, spending, and macroeconomic policy decisions.",11,12,AS,"Good Points and Nice analysis. Evalauation is present, but lacks depth.",Income elasticity of demand and  Price elasticity of demand,2026-06-11
+In conclusion, YED is useful to both producers and governments because it helps predict how demand will change as incomes change. However, its usefulness is limited as it is only an estimate and does not account for all factors affecting demand. Overall, YED may be more useful to governments as it assists with taxation, spending, and macroeconomic policy decisions.",11,12,AS,"Good Points and Nice analysis. Evalauation is present, but lacks depth.",Income elasticity of demand and  Price elasticity of demand,2026-06-11,migrated
 Assess whether price elasticity of demand (PED) or income elasticity of demand (YED) is likely to be of greater importance to a firm producing cars.,"Price elasticity of demand measures the responsiveness of quantity demanded to a change in price. If PED>1 it is elastic, if PED less than 1 it is inelastic. Income elasticity of demand measures the responsiveness of quantity demanded with a change in income. If YED greater than 1 it is a luxury good, YED less than 0 it is inferior good, and greater than 0 and less than 1 it is normal.
 
 To analyse if PED or YED is more important in the car industry, we must first consider the type of car that is produced.
@@ -29,7 +29,7 @@ Some cars like Ferrari have high levels of brand loyalty, leading to them having
 
 Also, the number of substitutes also makes a difference. As the cars become more luxurious, the number of substitutes reduces making their PED inelastic and less significant to firms, making YED more important to predict future sales. As an example we  have Nissan which has many substitutes like Honda, but Ferrari has limited substitutes under the limited market shares in the supercar market. Finally, it depends on the long run and short run. They are usually more accurate in the long run because behavior adjusts overtime.
 
-In conclusion, YED and PED are each important spending on the type of car, brand loyalty, number of substitutes and time period. But, YED is overall more important as it can be used for all brands and types of cars to classify if it’s an inferior, normal or luxury goods.",10,12,AS,Some points lacks depth and Evalaution is shallow,Income elastcity of demand (YED) and Price elastcity of demand (PED),2026-06-11
+In conclusion, YED and PED are each important spending on the type of car, brand loyalty, number of substitutes and time period. But, YED is overall more important as it can be used for all brands and types of cars to classify if it’s an inferior, normal or luxury goods.",10,12,AS,Some points lacks depth and Evalaution is shallow,Income elastcity of demand (YED) and Price elastcity of demand (PED),2026-06-11,migrated
 "Assess the likely success of any two government policies to make the price elasticity of supply of all agricultural products are more elastic.
 endd","I have already referred to the fact that the price elasticity of supply of agricultural products is 
 likely to be relatively more inelastic than manufactured products in (a). 
@@ -75,7 +75,7 @@ The answer achieves Level 2 for AO3 (Evaluation). It develops evaluative comment
 stating or listing relevant points and the advantages and disadvantages of each policy are considered before 
 reaching a reasoned conclusion. The answer gained three of the four available comments as it was felt that 
 there was scope to have developed the evaluation more fully in places, such as in relation to which particular 
-agricultural products might be more difficult to store and/or refrigerate and why this might be the case.",PES,2026-06-11
+agricultural products might be more difficult to store and/or refrigerate and why this might be the case.",PES,2026-06-11,migrated
 "Assess whether expansionary monetary policy is likely to be successful in reducing all types of 
 unemployment.","Monetary policy refers to one type of government policy to achieve macroeconomic 
 objectives by intervention in an economy in different ways. Expansionary monetary policy 
@@ -136,21 +136,23 @@ stating or listing relevant points and the strengths and weaknesses of each mone
 considered before reaching a reasoned conclusion. The answer gained three of the four available comments 
 as it was felt that there was scope to have developed the evaluation more fully in places, such as in relation 
 to particular examples of frictional, structural, technological and seasonal unemployment that would not be 
-affected by the expansionary monetary policy",monetary policy,2026-06-11
+affected by the expansionary monetary policy",monetary policy,2026-06-11,migrated
 "Assess the extent to which a subsidy is likely to be the best method to increase the
-consumption of a merit good.","A subsidy is a financial grant given by the government to producers of a good to increase the quantity produced and to decrease the price at which it is sold. A merit good is a good that creates more positive externalities than what is internalised, leading to underproduction if left to the free market.
+consumption of a merit good.","A subsidy is a financial grant given by the government to producers of a good to increase the quantity produced and to decrease the price at which it is sold. A merit good is a good that creates more positive externalities than what is internalised during consumption if left to the free market.
 
-In a free market there is the existence of information failure which is a type of market failure, meaning that consumers don't internalise all the benefits produced after consumption of merit goods. This in turn leads producers to decrease supply, as there is a signal that demand is low for this good. This leads to underconsumption and underproduction of merit goods. Thus government intervention is needed to fix this market failure. This diagram shows what happens when a subsidy is provided to producers of a merit good. The producer revenue increases from PaQ0 to eCQ1O. Quantity demanded increases from Q0 to Q1 and price falls from P to P1. So consumers benefit by saving Pa d P1. This lower price incentivises consumers to increase consumption of the merit good, thus decreasing the negative effect of market failure.
+In a free market there is the existence of information failure, which is a type of market failure. This means that consumers only internalise all the benefits produced after consumption of merit goods. This in turn leads producers to decrease supply as there is a signal that demand is low for the good. This leads to underconsumption and underproduction of merit goods. Thus government intervention is needed to fix this market failure.
 
-However, there is still a chance that despite lower prices consumers don't increase their consumption of merit goods by a lot due to lack of knowledge of its importance. In this case the government should focus on educating its people on the need for merit goods such as healthcare and education and all of their associated benefits. Moreover, there might still be a large portion of the population that are still unable to afford healthcare at this low subsidised price. So despite realising the benefits, the ability to pay is absent. This unregistered demand may incentivise firms to reduce quantity supplied and thus reduce the benefit the consumers experience due to the subsidy. To solve the problem of unaffordability, the government should involve direct provision, where the government itself provides these merit goods at little to no price. This ensures maximum benefit to society.
+This diagram shows what happens when a subsidy is rendered to producers of a merit good. The producer revenue increases from P to Q and quantity demanded increases from Q to Q₁ and price falls from P to P₁. Consumers benefit by paying a lower price, incentivising consumers to increase consumption of the merit good, thus decreasing the impact of market failure. However, there is still a chance that despite lower prices consumers don't increase their consumption of merit goods by a lot due to a lack of knowledge of its importance. Thus the government should focus on educating its people on the need for merit goods such as healthcare and education and all of their associated benefits.
 
-However there is a problem of oversubsidisation or undersubsidisation and how much of the subsidy the firm is actually passing onto consumers. When there is oversubsidisation, it shows an inefficient allocation of resources and causes opportunity cost as the money allocated could have been spent on public goods and etcetera. And undersubsidisation won't allow firms to maximise output of the good leading to a lower positive effect than intended. Furthermore, bias present within the firm (i.e. corruption) can mean that the firm is using most of the subsidy to benefit itself compared to the consumers.
+Moreover, there still might still be a large portion of the population that are still unable to afford healthcare at this low subsidised price. So despite realising the benefits, the ability to pay is absent. This unregistered demand may incentivise firms to reduce quantity supplied and thus reduce the benefit that consumers experience due to the subsidy. To solve this problem of unaffordability, the government should involve direct provision, where the government itself provides these merit goods at little to no price. This ensures maximum benefit to society.
 
-Moreover certain firms may use the subsidy to cover costs of inefficiency instead of increasing output capacity through high productive efficiency. Thus once again the goal of increasing consumer consumption is not met.
+However, there is a problem of oversubsidisation or under-subsidisation and how much of the subsidy the firm is actually passing onto consumers. If there is over-subsidisation, it poses an inefficient allocation of resources and causes opportunity cost as the money allocated could have been put on private goods and factors. And under-subsidisation won't allow firms to maximise output of the good, leading to a low positive effect than intended. Furthermore, bias present within the firm (i.e. corruption) can mean that the firm is using most of the subsidy to benefit itself compared to the consumers.
 
-Other ways through which the government can increase the consumption of a merit good are by decreasing income tax so that consumers have more disposable income to allocate towards merit goods. However all of these methods will face a time lag between implementation and actual benefits being seen as it may take consumers to change their habits. For instance if a person who is an alcoholic spends over 30% of their income on alcohol, they are unlikely to increase consumption of merit goods despite realising their benefits since alcohol is addictive and increasing consumption of merit goods means they have to cut down on spending on alcohol.
+Moreover, certain firms may use the subsidy to cover costs of inefficiency instead of increasing output capacity through new productive efficiency, thus increasing real cost of increasing consumer consumption but not output.
 
-Thus a subsidy isn't the best method to increase the consumption of a merit good if other policies such as increased awareness campaigns, direct provision and lower taxes aren't implemented. These strategies alongside provision of subsidies will provide maximum public welfare, so the government should assess the extent of information failure present to implement a good mix of these strategies to maximise consumer welfare.",10,12,AS,Full marks for Knowledge and Analysis. Marks cut in evaluation. Lacks depth and counter arguemnts. Needs more depth.,subsidy and merit goods,2026-06-11
+Other ways through which the government can increase the consumption of a merit good are by decreasing income tax so that consumers have more disposable income to allocate towards merit goods. However, all of these methods hold flaws. Time lag between implementation and actual benefits may not exist under direct provision. If there is an alcohol spend tax of 30% of their income on alcohol, they are unable to increase consumption of merit goods despite realising their benefits, since alcohol is addictive and increasing consumption of merit goods means they have to cut down on spending on alcohol.
+
+Thus, a subsidy isn't the best method to increase the consumption of a merit good in all circumstances, but it can be an effective method. Direct provision and lower taxes are all important strategies alongside subsidies. Subsidies provide maximum public welfare if the government solves issues such as information failure present in the market and consumer welfare barriers.",10,12,AS,Full marks for Knowledge and Analysis. Marks cut in evaluation. Lacks depth and counter arguemnts. Needs more depth.,subsidy and merit goods,2026-06-11,migrated
 Assess the extent to which supply-side policy is the best method to reduce the rate of inflation,"Supply-side policies are policies aimed at increasing the aggregate supply of the economy. This involves training, expanding workers to increase their skills and qualifications to increase their employability, thus increasing their standard of living, causing economic growth. Inflation is essentially the rise in price level of an economy over a period of time.
 
 If inflation rate is the percentage by which the inflation changes and can be classified into two types, there is creeping inflation and accelerating inflation. Creeping inflation is a very low rate of inflation and accelerating inflation is an extremely high growth rate of inflation. It is characterised by over a 50% increase in price level a month.
@@ -169,4 +171,268 @@ Investing in technology and research and development as a form of supply-side po
 
 This increase in aggregate supply helps lower rate of inflation by lowering cost-push inflation.
 
-In conclusion, a mix of all the supply-side policies along with the implementation of contractionary demand side policies will help reduce the rate of inflation in both the short-run and the long run. The government should analyse the situation of the economy and accordingly decide the magnitude of implementation of the supply-side and demand-side policies to ensure a low and stable rate of inflation. As a high rate of inflation causes uncertainty and instability in an economy which leads to low economic growth. However, if only one supply-side policy had to be chosen it would be to improve the education and training of workers as it would help increase aggregate supply sustainably accordingly to aggregate demand.",4,12,AS,Lacks evalaution comepleltly. Very less marks for knowledge and understanding. Weak arguemnts and confusing statments.,Supply side policies,2026-06-11
+In conclusion, a mix of all the supply-side policies along with the implementation of contractionary demand side policies will help reduce the rate of inflation in both the short-run and the long run. The government should analyse the situation of the economy and accordingly decide the magnitude of implementation of the supply-side and demand-side policies to ensure a low and stable rate of inflation. As a high rate of inflation causes uncertainty and instability in an economy which leads to low economic growth. However, if only one supply-side policy had to be chosen it would be to improve the education and training of workers as it would help increase aggregate supply sustainably accordingly to aggregate demand.",4,12,AS,Lacks evalaution comepleltly. Very less marks for knowledge and understanding. Weak arguemnts and confusing statments.,Supply side policies,2026-06-11,migrated
+Discuss whether or not a government should aim for an increase in imports.,"d) An increase in imports can cause a current account deficit, which can have both negative
+an dposive effects.
+Increased imports can cause a decrease in domestic production. As increased imports mean
+sless demand for domestic firms, firms are less incentivised to produce goods, leading to
+lower GDP and less economic growth. Here is demand curve to show02-01
+s
+3 Py SE ae
+= oN' Dd,
+q
+Quantity q
+Increased imports may also calI currency depreciation. As increased imports means an
+increase in demand for foreign currency in terms of the domestic currency, the exchange
+rate falls. This means that the currency value decreases, and imports become more
+expensive. Thai may cause cost-push inflation if raw materials are imported(Rise in
+production costs), leading to high price levels.
+ficreased imports can cause a decline of domestic firms. As increased imports cause a rise
+in competition, sunset and infant firms may decline, as they may not be able to match the
+import quality. Thai causes a loss in production and lower GDP for the domestic county,
+causing low economic growth and possible recession, while decreasing government tax
+revenue.
+On the other hand, increased imports can mean free trade and specilaisation. As increasing
+imports help build better foreign relations, especially if tariffs are low. This promotes free
+trade, which means metter quality of products overall, and helps increase specialisation, as
+firms can focus on producing a set of products they are good at producing, increasing
+production, and helping internationaI relations.
+Also, increased imports may help increase domestic firm export coemtiviness. As increased
+imports increase competition in domestic markets, domestic firms may become more
+innovative and efficient(Reduce x-inefficicny) in production, by lowering production cost with
+capital, they can gain a comparative advantage in foreign markets, increasing export
+competitiveness over the long run.
+In conclusion, increased imports can be helpfuI and disastrous at the same time, but
+depends on the country's development and category, depending on their sectors and
+iductries.",7,8,IGCSE,Uses valid economics theory. Lacks depth and has minor inaccuracy.,International Economics,2026-06-12,image_ocr
+Evaluate how merit goods and demerit goods affect the economy,"Merit goods are goods which have positive externalities and social benefits, like education and healthcare. Demerit goods are goods with negative externalities (social costs), like tobacco and alcohol. Free market system's price mechanism is dictated by the market forces of demand and supply, therefore what is demanded is supplied and what is not demanded is not supplied. This can cause market failure - when free market fails to allocate resources efficiently to boost productivity and social welfare. For instance, the overproduction and overconsumption of demerit goods and the under-provision and underconsumption of merit goods.
+
+This may be caused by information failure; when consumers are uninformed / lack the information on how beneficial or harmful a product they are consuming is, preventing them from making informed and rational decisions.  For instance, people may be unaware of the physical and psychological harm smoking can cause, and by consuming it, third parties also get affected through passive smoking and the economy as a whole suffers from a population that may have poor health and issues preventing productivity, limiting economic growth and output and increasing strain on the health sector. 
+Another example is people not knowing the benefits of eating fruits and therefore choosing junk food over it, not knowing the long - term impacts it may have on the body.
+Due to this scenario of imperfect information the value of products to consumers may be higher for demerit goods and lower for merit goods than what is beneficial socio-economically.
+
+The free market's primary goal is profit which is why mixed economies use government intervention like tax, subsidies, regulation, and other (supply side) policies to prevent market failure and maintain social welfare. They can also facilitate /create free education and outreach programs to reduce information failure. However, even in a mixed economy, demerit goods may be overconsumed due to their addictive nature and inelastic demand.",8,8,IGCSE,,Market Failure,2026-06-13,typed
+Assess whether cross elasticity of demand is likely to be more important in determining the demand for electric cars than income elasticity of demand.,"XED is the responsiveness of quantity demanded for product A to a change in price of product B. YED is the responsiveness of quantity demanded to a change in income.
+
+XED can be more important for EV manufacturers due to the market structure. Currently, lots of new EV manufactures such as Lucid and BYD have entered the market, making it extremely competitive. XED can help EV firms price their products and help predict whether production needs to be increased. For example, if Tesla suddenly raises prices, BYD can quickly predict the increase in quantity demanded of BYD cars, helping them quickly increase production and maximize revenue. 
+
+But, this depends on other factors such as PES. While firms can predict demand increases, they must be able to quickly respond to these changes. Therefore their PES must be elastic in supply. Thai means that there must be excess stock, spare production capacity or other means to meet market demand. If PES is inelastic, firms cannot meet demand, and cannot maximize revenue. Therefore PES also must be considered.
+
+XED can also help with mergers and acquisitions. When EV companies want to merge and take benefits of economies of scale, they may consider how close of substitutes they are. It can help determine how the merger can help them price products, and how that affects competitors demands. If XED is highly positive, it means they are close substitutes, so merging can help them increase productivity and lower production cost, and this can be indicated using XED.
+
+But, this may not occur due to government intervention. In a mixed or planned market system, governments try to prevent monopoly abuse. They want to ensure that firms don’t increase prices. Therefore, when high market value firms try to merge, the government may consult the XED and other factors and prevent mergers from occurring.
+
+On the other hand, YED is more beneficial spending on the economic life cycle. YED can help predict the pricing and production requirements of EV cars in periods of economic growth and recession. EV cars may be demanded less as they are normal goods in periods of recession, when consumer incomes are low, therefore manufacturers may have to reduce prices and lower production to ensure losses don’t occur. During economic growth, income rises, meaning products can be priced higher, helping firms increase revenue. 
+
+But, this depends on various factors. Firstly, both XED and YED or estimates. Their values keep changing as the market is constantly fluctuating, making them inaccurate. Therefore, firms have to take into account other factors like PED and consumer confidence, before pricing or producing. For example, if PED of EV is elastic, increased pricing can result in losses, no matter how high incomes are. 
+
+Therefore, YED can be extremely beneficial during economic growth and recession, as changes in income can significantly affect demand, and can result in drastic market changes. But, in the now highly competitive EV market, XED can bring in plans for merger, increasing pricing depending on substitute pricing and helping firms to ensure that pricing is competitive.
+
+In conclusion, both XED and YED have their benefits, in terms of pricing and market strategies. But, XED can majorly help EV firms in the competitive market, helping them navigate mergers and ensuring that pricing is effective. Though YED can help during economic growth and recession, XED may be more important in terms of analysing market changes and global economy changes too.",10,12,AS,Has lots of valid points. Word count is extremely high. Evaluation though present seems not clear and progressive enough.,Microeconomics,2026-06-13,typed
+Discuss whether or not an increase in the money supply will benefit an economy,"An increase in money supply may be an expansionary monetary policy The monetary policies are controlled by the central bank.
+
+An increase in money supply may result in higher growth of GDP and total revenue in the economy. As money supply rises, incomes of consumers rise and there is an increased spending in the economy. This spending causes AD to rise, causing demand pull inflation, which incentives suppliers to produce more, leading to GDP and production rising. Here is a diagram that shows how demand cause increased supply-
+
+
+
+An increase in money supply may result in less unemployment and poverty. As money supply rises, it triggers an increase in production because demand pulls inflation. This results in more job opportunities and higher wages, which can help reduce poverty and promote consumer confidence. This may help improve living standards and reduces absolute poverty, leading economic development
+
+An increase in money supply can result in BOP stability and increased export competitiveness. As money supply rises, firms may invest more in capital and quality of their products, while lowering their costs. This may help them become more internationally competitive, leading to more exports. Increased exports can improve BOP stability and increase currency appreciation, and promote growth.
+
+On the other hand, increased money supply may cause cost-push inflation. As money supply rises, a rise in spending can cause a rise in AD and increased demand. While this demand can help incentivise producers, if the producers are lacking raw material required for production, it may raise cost. Also if workers and unions bargain for wages, it may cause wage spiral inflation. Thai causes a rise in general price levels, which can result in poverty and instability in long run.
+
+Increased money supply can also lead to currency depreciation. As money supply rises, there is more currency in the international markets. Increased supplies in these foreign markets can cause a lack of demand for the currency leading to depreciation. This may cause import prices to rise and cause BOP instabilities.",6,8,IGCSE,Conclusion is not fully developed. Points are valid but lacks depth analysis,Macroeconomics,2026-06-13,typed
+"Discuss whether, for a manufacturer of smartphones, knowledge of their product’s price
+elasticity of demand or its cross elasticity of demand with respect to other products is more
+useful","price elasticity of demand (PED) is a numerical measure of responsiveness of demand to a change in price. Cross elasticity of demand (XED) is a numerical measure of responsiveness of the quantity demanded of A to a change in price of product B. Knowledge about PED may be very beneficial to a manufacturer. It will allow the producer to set prices and change them in order to raise revenue. For example, if demand is elastic, a firm will want to maintain low prices or further lower prices from existing levels as it will increase revenue. This is because change in demand will be higher than change in price. Information about PED will even help a firm implement a price discrimmination policy to different consumers based on differences in their PED. So, this will allow the smartphone producer to maximise revenue from every consumer group. For example, children/elderly are likely to have elastic demand, charging them lower for smartphones and business people may have inelastic demand, encouraging producers to charge them higher. Knowledge about XED will help a business identify its competitors. It will help the smartphone producer understand the effect of a change in competitors strategies, to that of sales of their smartphone marketing and promotional strategies and help understand how effective they will be when compared to that of competitors. XED will even help producers understand complements of their smartphones like earphones, chargers, encouraging them to expand their production and profits. But, both PED and XED calculations are based on the ceteris paribus assumptions which may not stand true in real life. Also, they are based on past calculations, which may not be accurate representations of future market conditions, given the dynamic structure of the markets. Overall, for a smartphone manufacturer, I believe knowledge of XED will be of greater importance as it is something that the smartphone producer doesn’t have control over. However, PED is something the producer has direct control over, in terms of how they devise their pricing strategies. They do not have control over their competitors actions.",8,12,AS,,Microeconomics,2026-06-13,typed
+Discuss whether or not having a fixed exchange rate will benefit an economy.,"A exchange rate is a value of one currency in terms of another. Fixed exchange rate is controlled by government.
+
+A fixed exchange rate increase certainty and promotes economic growth. As the exchange rates are fixed, domestic firms may be more confident to invest, as they know the exact amount required to import capital and export. Increased confidence leads to more production and economic growth.
+
+A fixed exchange rate also increases foreign direct investment and MNC. As fixed rates increases certainty, foreign investors are more likely to invest as their confidence is high. It may also attract MNC, as no fluctuation in exchange rates means more stability, leading to economic growth.
+
+Speculation can be reduced. A fixed exchange rate may reduce investor speculation and flow of hot money. It means that the country can avoid increased demand or low supply, and hoarding of currency, leading to more exports and BOP stability in long term. It helps prevent rapid appreciation depreciation.
+
+On the other hand, a fixed exchange rate is extremely inefficient for the government. As the constant need for change in exchange rate may increase administrative cost and decrease effectiveness of other policies like monetary. This leads to long term instability and less independence for governments, leading to ineffective use of policies.
+
+Also fixed exchange rates need high amount of foreign reserves and cannot benefit from autostabilisation. As increasing the value of currency through revaluation may means borrowing foreign currency, the government debt may increase. Also if there are constant rise or fall in demand, the government cannot act quickly leading to inefficient production and low economic growth, or excess demand or excess supply (disequilibrium).
+
+In conclusion, a fixed exchange rate may only be positive if a country has a large foreign reserve. But, other methods like banded floating may be more effective.",8,8,IGCSE,Well Rounded essay,Macroeconomics,2026-06-13,typed
+Discuss whether or not trade union membership is likely to increase.,"Trade union is organisation of workers bargaining representing to improve wages and working condition.
+
+Trade union membership may rise due to population growth. As the world population continues to grow, more workers enter the labour force, leading to more chance of workers joining unions, increasing membership of trade unions in long run.
+
+Trade union may increase in membership to increase wages. Workers may need higher wages due to inflation, leading to more workers joining the union to increase collective bargaining powers. Increasing bargaining power and use of industrial action can help workers and more future membership.
+
+More membership may occur due to training provision. Trade unions offer their members workshops and training which increase skill and productivity of workers. This may incentivise more workers to join unions.
+
+On the other hand, higher membership cost can demotivate membership. If trade unions charge higher costs to fund industrial action, workers may lose a lot of their disposable income, leading to less incentive to join unions.
+
+Also, if trade unions constantly push for higher wages, increased unemployment can decrease membership. If the union is constantly in industrial action, rate of production may be low, leading to less revenue for firms, and lay off of workers, leading to a decrease in membership.
+
+In conclusion, trade unions help protect working conditions, but the skill levels and productivity of other workers and their aims may be a reason for increase in memberships.",6,8,IGCSE,The population point is weak. More judgment and valid points must be included,Business Economics,2026-06-13,typed
+Discuss whether or not people who emigrate will always enjoy a higher living standard.,"Emigration is when workers/individuals move out of the country. Living standards are measured through HDI.
+
+It depends. Emigrants may have a high living standard due to low income tax. Some foreign countries like Dubai have low income tax that increases disposable income, leading to a low chance of absolute poverty and an increase in the income index of HDI.
+
+Emigrants may have a high quality of life due to free education. Some countries like the USA offer free education. This may increase the skills of emigrants while improving literacy rates, increasing the education index of HDI.
+
+Emigrants may have a high quality of life due to cheap quality healthcare. Some countries like the Netherlands offer cheap quality healthcare, which may benefit emigrants as their health and productivity are improved and higher life expectancy can improve the healthcare index of HDI.
+
+On the other hand, high living costs can reduce quality of life for emigrants. Some places like California in the US have a high cost of living. High costs lead to less ability of consumers to spend on necessities, leading to chances of poverty/relative poverty increasing for emigrants.
+
+Also, the political and social situation matters. For example, the current US regulation on Indian visas and regulations has lowered living standards of emigrants. Also, discrimination and social views may cause worker wages to be low, leading to a low living standard and low income.
+
+Therefore, quality of life and living standards depend on which country the emigrants are moving to. It depends on that country's government and overall political situation. As emigrating to areas of danger like Palestine is not advisable.",6,8,IGCSE,Points not fully developed. Examples are misused.,International Economics,2026-06-13,typed
+Discuss whether entrepreneurs or governments are more likely to cause economic growth in a mixed economy.,"Economic growth is defined as an increase in real GDP over time. In a mixed economy, both entrepreneurs in the private sector and governments in the public sector contribute to growth through different mechanisms. The extent to which each drives growth depends on structural and institutional factors.
+
+Entrepreneurs are central to economic growth due to their role in investment, innovation, and job creation.
+
+They mobilise factors of production to establish firms, increasing output and contributing directly to GDP. Furthermore, entrepreneurs introduce innovation—new products, processes, and technologies—which enhances productivity and shifts long-run aggregate supply (LRAS) to the right, enabling sustained economic growth.
+
+In addition, entrepreneurial activity increases employment, raising household incomes and consumption, thus boosting aggregate demand (AD). This creates a multiplier effect, further increasing national income.
+
+However, the effectiveness of entrepreneurs depends heavily on access to finance, education, and infrastructure. In economies where these are underdeveloped, entrepreneurial potential may remain constrained.
+
+Governments play a crucial role by creating the conditions necessary for economic growth.
+
+Through investment in infrastructure, education, and healthcare, governments improve the quality of human capital and the efficiency of production. This enhances productivity and shifts LRAS outward.
+
+Governments can also use fiscal and monetary policy to stabilise the economy. For example, expansionary fiscal policy during a recession can increase AD, reducing unemployment and stimulating short-run growth.
+
+Moreover, governments correct market failures by providing public goods and supporting research and development through subsidies and tax incentives, encouraging private sector investment.
+
+However, excessive government intervention may lead to inefficiency, such as bureaucratic delays or misallocation of resources. High taxes may reduce incentives for entrepreneurs to invest and take risks.
+
+The relative importance of entrepreneurs versus governments is context-dependent.
+
+In developing economies, governments are often more significant as growth enablers because they provide essential infrastructure and institutional frameworks that entrepreneurs rely on. Without these, private sector activity may be too weak to generate sustained growth.
+
+Conversely, in developed economies, entrepreneurs are likely to be the primary drivers of growth due to access to capital, advanced technology, and efficient markets. Here, excessive government intervention may even crowd out private investment.
+
+However, this distinction is not absolute. The most effective growth outcomes arise when there is complementarity between the two. Governments create a stable macroeconomic environment, enforce property rights, and invest in human capital, while entrepreneurs respond by innovating and expanding production.
+
+Furthermore, the quality of governance is critical. Ineffective governments may hinder growth through corruption or poor policy choices, while dynamic entrepreneurs can still drive growth despite some institutional weaknesses.
+
+Although both entrepreneurs and governments are important, neither alone is sufficient to ensure sustained economic growth. Entrepreneurs are the immediate drivers of innovation and production, but governments provide the essential framework within which they operate. Therefore, economic growth in a mixed economy is most likely when both work effectively in tandem, with their relative importance varying by level of development and institutional quality.",11,12,AS,Balanced and well-analysed second side. Good use of policy tools and links to both AD and AS,Market Failure,2026-06-13,typed
+"Discuss why some goods and services are provided by private enterprise and
+others by the government in a mixed economy.","A mixed economy is one in which resources are allocated through both the price mechanism and government intervention. While private enterprises operate on profit motives, governments intervene to correct market failures and promote equity. The differing characteristics of goods explain why some are provided privately while others are supplied by the state.
+
+Private enterprises provide goods and services that are rival and excludable, where consumers can be charged a price. Since firms aim to maximise profit, they respond to consumer demand through the price mechanism. This leads to efficient allocation of resources in competitive markets, as firms produce goods that consumers are willing and able to pay for, such as manufactured products and retail services.
+
+Moreover, competition among private firms can lead to innovation, cost efficiency, and improved quality, further enhancing economic welfare. Therefore, for most private goods, the market mechanism ensures efficient provision without the need for government involvement.
+
+However, the market fails to allocate resources efficiently in certain cases, justifying government provision.
+
+Firstly, public goods are non-rival and non-excludable, meaning that consumption by one individual does not reduce availability to others, and non-payers cannot be excluded. This creates the free rider problem, where individuals have no incentive to pay, leading to no provision by private firms. Hence, governments provide goods such as defence and street lighting.
+
+Secondly, merit goods such as education and healthcare are underprovided by the market because individuals underestimate their true benefits.
+
+Thirdly, governments may intervene in the case of demerit goods, such as tobacco, which are overprovided by the market due to overestimation of benefits, by imposing taxes or regulations.
+
+Additionally, governments provide goods to promote equity, ensuring that essential services are accessible to all, regardless of income.
+
+The extent to which goods are provided by the government or private sector depends on several factors.
+
+In theory, government intervention improves welfare by correcting market failures. However, in practice, government failure may occur due to inefficiency, lack of profit incentives, or political interference, leading to misallocation of resources.
+
+On the other hand, while private enterprises are efficient, they may lead to inequality as goods are allocated based on ability to pay rather than need. This justifies government provision of essential services.
+
+Furthermore, the balance between public and private provision depends on the level of economic development. In developing economies, governments may play a larger role due to weaker institutions and markets, whereas in developed economies, private sector provision may be more dominant.
+
+While private enterprises efficiently provide goods through the price mechanism, they fail in cases of public goods and other market failures. Governments therefore intervene to ensure efficiency and equity. The most effective allocation of resources in a mixed economy occurs when both sectors complement each other, with the relative importance depending on the nature of the good and the economic context.",10,12,AS,,Microeconomics,2026-06-13,typed
+Discuss the way in which resources are allocated in planned economies and free market economies. Consider which type of economic system is likely to have the more beneficial outcome.,"The economic system is the term used to describe the means or allocative mechanism by which its people, businesses and government make choices regarding the allocation of scarce resources. Traditionally, economists have recognised three distinct types of economic system – these are the market economy, the planned economy and the mixed economy. It is often debated which one of these economic systems is more beneficial.
+
+In a free market economy, decisions on how resources are to be allocated are usually taken by the price mechanism. The price mechanism determines the production, utilisation of resources, and pricing. This means that the forces of demand and supply determine what goods and services will be produced, how they will be produced and for whom they will be produced. Prices act to indicate the likely market value of particular resources. For example, a commodity in short supply but that has a high demand attached to it will have a high price. Alternatively, one that has a high supply and low demand will have a much lower price attached to it. Prices and the self-interest of people and businesses therefore act as a guide to the decisions that have to be taken. For example, if consumers decide they want more of a good, demand will exceed supply and prices will rise. This is a signal to suppliers to expand production to meet the higher demand. Most importantly, the government has a very restricted part to play in a market economy.
+
+The advantages of a market economy include increased efficiency, productivity, and innovation. The profit motive encourages producers to be more efficient. The lack of government intervention leads to competition and increased efficiency. With the existence of competition, a business tends to do whatever is necessary to lower its costs and achieve a higher number of sales and increase its profit. Innovation is also promoted because it provides a competitive edge.
+
+It is often argued that the free market is unable to allocate resources efficiently due to market failures. For example, there tends to be an overconsumption and overproduction of demerit goods. A demerit good is a good that is worse for the individual consumer than the individual realises. Examples are alcohol, cigarettes and various drugs. There is also an under-consumption and under-production of merit goods. A merit good is defined as a good that is better for a person than the person who may consume the good realises. Examples are education and healthcare.
+
+The free market fails to provide public goods such as defence or street lighting. This is because public goods are non-excludable and non-rival. Non-excludable means that it is costly or impossible for one user to exclude others from using a good, and this gives rise to the free-rider problem. Non-rival means that the consumption by one consumer does not restrict consumption by other consumers.
+
+The market economy also does not take externalities into consideration. For example, market economies are likely to produce more pollution, which is bad for the environment.
+
+In the planned economy, the government has a central role in all decisions that are made and, unlike the market economy, the emphasis is on centralisation. Central planning boards and organisations make decisions in enterprises that are state-owned or under state regulation and control.
+
+Complete state control over resource allocation would involve a considerable loss of individual liberty. Workers would have no choice where to work; consumers would have no choice what to buy.
+
+It is argued that planned economies cannot detect consumer preferences, resulting in shortages and surpluses. If production is planned, but consumers are free to spend money incomes as they wish, there will be a problem if the wishes of consumers change. Shortages will occur if consumers decide to buy more; surpluses will occur if they decide to buy less. Market prices play little or no part in informing resource allocation decisions and queuing rations scarce goods. Thus resources will not be allocated in an efficient way.
+
+If there is no system of prices, or if prices are set arbitrarily by the state, planning is likely to involve the inefficient use of resources. For example, a rational decision cannot be made between an oil-fired and a coal-fired furnace if the prices of oil and coal do not reflect their relative scarcity.
+
+In a mixed economy, some resources are owned by the public sector (government) and some are owned by the private sector. The public sector typically supplies public, quasi-public and merit goods and intervenes in markets to correct perceived market failure.
+
+Decisions on most important economic issues involve some form of planning (by private as well as public enterprises) and interaction between government, businesses and labour through the market mechanism. Private ownership of productive resources operates alongside public ownership in many mixed economies.
+
+Mixed economies may have a distinct public sector, where public goods such as defence are allocated mainly by the government.
+
+In mixed market economies, the government may control the pattern of production and consumption by the use of legislation, by taxes and subsidies or by nationalisation. In many sectors, resources are allocated by a combination of markets and planning, such as healthcare, which has both public and private provision.
+
+The government may impose taxes to dissuade the consumption of demerit goods and provide subsidies to encourage the consumption of merit goods.
+
+To conclude, the mixed economy is the best form of economic system because both free market forces and government participation are required in the allocation of resources. It combines the strengths of both systems while reducing many of their weaknesses, making it more likely to achieve efficient and equitable outcomes.",12,12,AS,Most of the evaluation is really additional analysis of mixed economies rather than direct judgement.,Microeconomics,2026-06-13,typed
+Assess whether transfer payments are a better method of helping low-income households than fixing a maximum price for an essential food item.,"Maximum price is a price ceiling imposed by government on essential items which prevents producers from charging a price above the equilibrium price in the market.
+
+Transfer payments are financial support provided by government to people with low income to help them meet basic necessities of life in order to prevent income inequality in society.
+
+A policy of fixing the maximum price for an essential food item would help people on low income afford basic necessities such as rice. This will help protect welfare of people on low income as the maximum price prevents the price of rice from rising which would burden the people on low income.
+
+However, maximum price imposed could lead to shortages in the market for rice as the quantity demanded will exceed the quantity supplied because profit-driven firms are not willing to increase supply at a low price because it is not profitable. This causes people to obtain basic necessities on a first come, first serve basis due to the shortage.
+
+Furthermore, there will also be emergence of black markets as firms might hide stocks to sell it at a lower price illegally in order to make more profit. This could harm people on low incomes as they would have no choice but to buy the goods at a higher price.
+
+On the other hand, transfer payments to low-income households can help increase their purchasing power. This will enable them to afford a wider range of goods and services in the market and not only basic essentials like rice. This can help people on low income to increase their standard of living as they would be able to afford all basic necessities of life like food and other goods and services which can help enhance the quality of their life.
+
+However, providing transfer payments to every individual on low income can be costly for the government. Governments will face an opportunity cost as funds used to provide transfer payments could have been reallocated to improve healthcare and education which could benefit everyone in society.
+
+Furthermore, transfer payments might lead to overdependency among low-income households in the long run as people might lose the motivation to find a better paying job because they believe the government will provide them continuous financial aid.
+
+Whether a policy of fixing the maximum price for an essential food item is likely to be more effective than transfer payments for low-income households depends on the ability of the government to implement an effective rationing system by providing coupons to ensure everyone’s basic necessities are equally distributed to everyone in society to overcome the shortages. Besides that, it also depends on whether the government is able to control the emergence of black markets by imposing strict regulations and heavy fines on producers who engage in such malpractices.
+
+In addition, whether transfer payments will be better than maximum price would depend on the government's budget position. If the government has high national debts and is running a budget deficit then it will be difficult for government to provide sufficient transfer payments to help low-income households nationwide.
+
+In conclusion, making transfer payments to low-income households would be more effective compared to maximum price due to the unintended consequences of maximum price which may place a greater strain on the government budget due to the additional measures which need to be taken to ensure its effectiveness.",11,12,AS,,Microeconomics,2026-06-13,typed
+Assess whether transfer payments are a better method of helping low-income households than fixing a maximum price for an essential food item.,"Both maximum prices and transfer payments are policy tools governments can use to improve access to essential food for low-income households. However, their effectiveness depends on government budget constraints, administrative capacity, and potential unintended consequences such as shortages or disincentives to work.
+
+Maximum Prices (Price Ceilings)
+
+A maximum price is a legally imposed upper limit on the price of a good, such as bread or rice. It is only effective when set below the market equilibrium price, where it is known as a price ceiling. As shown in a standard demand and supply diagram (Graph 1.6), the maximum price lowers the cost of essential food, making it affordable for low-income households. This addresses the immediate problem of unaffordability.
+
+However, maximum prices create undesirable side effects. Because the price is artificially low, quantity demanded (Qd) exceeds quantity supplied (Qs), leading to a shortage. This shortage can cause waiting lists, rationing, and low product quality, as producers have little incentive to maintain standards. Additionally, a black market may emerge where the good is sold illegally at higher prices, excluding the very people the policy aims to help. Therefore, while a maximum price directly controls the cost of food, it does not increase supply and can worsen access over time.
+
+Transfer Payments
+
+Transfer payments are government benefits given to low-income or disabled individuals without requiring goods or services in return. Examples include pensions, social welfare, unemployment benefits, and food stability provisions. By increasing the disposable income of poor households, transfer payments reduce income inequality and help close the gap between what households can afford and the cost of essential food.
+
+However, transfer payments also have drawbacks. First, they involve an opportunity cost: government spending on welfare reduces funds available for education, healthcare, or infrastructure. Second, generous transfer payments may create a disincentive to work, as some individuals might choose to receive welfare rather than seek employment. This could reduce the overall labour supply and potential output of the economy. For the government, the feasibility of transfer payments depends heavily on its budget situation. If the budget is sufficient, transfer payments can be a dignified way to help households without distorting food prices directly.
+
+Comparison and Evaluation
+
+On one hand, a maximum price directly targets the cost of essential food and may be more effective in a fiscal crisis when the government cannot afford large welfare payments. It does not rely on household behaviour and can be implemented quickly.
+
+On the other hand, transfer payments avoid shortages and black markets, preserving the market mechanism. They allow low-income households to choose what to buy, not just cheap food. However, the disincentive to work problem is real: if people stop working because they receive welfare, the policy becomes unsustainable.
+
+In conclusion, neither policy is perfect. A maximum price solves affordability but creates shortages and black markets. Transfer payments avoid these problems but risk disincentivising work and require a strong government budget. For essential food, a combination may be best: a modest maximum price for a narrow range of staple foods, complemented by targeted transfer payments to the poorest households. On balance, transfer payments are more effective in the long run because they address income poverty directly without destroying market incentives, provided the government can finance them efficiently.",9,12,AS,,Microeconomics,2026-06-13,typed
+Evaluate the view that increasing the quantity of factors of production is the most effective way for a government to achieve long-run economic growth.,"Enterprise is the person who makes key decisions and bears risk. Long run economic growth is the increase in potential output in a given period. Factor of production is land, labour, capital, enterprise.
+If government encourage entrepreneurship by increase the subsidy, the entrepreneurs may have incentive for innovation and develop new technology. The aggregate supply (AS) will increase in the long run. The potential output will increase. As diagram shows, the PPC curve will shift from PPC1 to PPC2. The economy will grow.
+However, the supply cost of subsidy exist opportunity costs: the budget can use to invest infrastructure such as highway. This may lead to a higher increase in AS.
+Also, if government lower the barrier of set of business, there may be more enterprise entering the market, the AS will increase in the short run, economic growth.
+Nevertheless, if the PES for the product is inelastic, the government encouragement may fail.
+On the other hand, the factor increase in 'labour' may also lead to economic growth. Firstly, if there is a net immigration, the labour force will increase. The potential output may increase, the economic growth.
+However, if the immigration people is major & consist of inability people, the labour force will not increase, even more, the government need to subsidy and give welfare. The opportunity cost of government spending may loss the chance to subsidy infrastructure, the long run AS may decrease.
+Finally, the land may also can increase economic growth: if people exploit new land, the spare resources increase, potential output increase, economic growth.
+But, if the country is already fully exploit the land, this method may be inefficient.
+In conclusion, the land and labour is under controlled. Government cannot control the quantity of immigrated labour and cannot discovery new land. So encourage enterprise is most effective way to achieve long run economic growth.",9,12,AS,"The candidate offers a simple
+explanation of how subsidies
+might incentivise entrepreneurs
+to innovate but asserts that this
+would increase LRAS. However, the
+development lacks a full explanation
+and the link between subsidies
+and increased long-run economic
+growth is not established. Similarly,
+references to the opportunity cost of
+granting subsidies, lower barriers to
+entry and the relevance of the PES
+are asserted rather than explained.",Microeconomics,2026-06-13,typed
