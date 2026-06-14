@@ -1,7 +1,8 @@
 # src/config.py
 # ─────────────────────────────────────────────────────────────────────────────
 # Central configuration for the Cambridge Economics Grader
-# Edit this file to change model, paths, or marking criteria
+# Tuned for: RTX 2050 (4GB VRAM) + 12GB RAM
+# Base model: Qwen2.5-1.5B-Instruct — best quality that fits in 4GB VRAM
 # ─────────────────────────────────────────────────────────────────────────────
 
 import os
@@ -16,48 +17,56 @@ MODELS_DIR      = BASE_DIR / "models"
 TRAINING_FILE   = PROCESSED_DIR / "training_data.jsonl"
 EVAL_FILE       = PROCESSED_DIR / "eval_data.jsonl"
 
-# Create dirs if they don't exist
 for d in [RAW_ESSAYS_DIR, PROCESSED_DIR, MODELS_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 
 # ── Base Model ────────────────────────────────────────────────────────────────
-# We use Mistral-7B-Instruct — strong reasoning, runs on most laptops (with 4-bit)
-# Alternatives if you have more RAM/GPU:
-#   "meta-llama/Llama-3-8B-Instruct"  (needs HuggingFace token)
-#   "google/flan-t5-large"             (smaller, less capable)
-BASE_MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.2"
+# Qwen2.5-1.5B-Instruct:
+#   - 1.5B parameters → fits in 4GB VRAM with 4-bit quantization
+#   - Strong instruction-following for structured grading output
+#   - Fast download (~3GB), fast training on RTX 2050
+#   - Much better than Phi/TinyLlama for long-form structured text
+#
+# Upgrade path (if you get access to more VRAM later):
+#   4-8GB  → "Qwen/Qwen2.5-3B-Instruct"
+#   8-16GB → "Qwen/Qwen2.5-7B-Instruct"
+BASE_MODEL_NAME      = "Qwen/Qwen2.5-1.5B-Instruct"
 FINE_TUNED_MODEL_DIR = MODELS_DIR / "cambridge_grader_v1"
 
-# ── Training Hyperparameters ──────────────────────────────────────────────────
+# ── Training Hyperparameters — tuned for RTX 2050 4GB VRAM ──────────────────
 TRAINING_CONFIG = {
-    "num_train_epochs":       3,
-    "per_device_train_batch_size": 2,
-    "gradient_accumulation_steps": 4,   # Effective batch size = 8
-    "learning_rate":          2e-4,
-    "warmup_ratio":           0.05,
-    "lr_scheduler_type":      "cosine",
-    "max_seq_length":         2048,
-    "save_steps":             50,
-    "logging_steps":          10,
-    "eval_steps":             50,
-    "load_best_model_at_end": True,
-    "fp16":                   True,     # Set False if no GPU
-    "optim":                  "paged_adamw_8bit",
+    "num_train_epochs":              3,
+    "per_device_train_batch_size":   1,      # 4GB VRAM — keep at 1
+    "gradient_accumulation_steps":   8,      # effective batch size = 8
+    "learning_rate":                 2e-4,
+    "warmup_ratio":                  0.05,
+    "lr_scheduler_type":             "cosine",
+    "max_seq_length":                1024,   # reduced from 2048 to fit VRAM
+    "save_steps":                    50,
+    "logging_steps":                 5,
+    "eval_steps":                    50,
+    "load_best_model_at_end":        True,
+    "fp16":                          False,  # RTX 2050 supports bf16 — more stable
+    "bf16":                          True,
+    "optim":                         "paged_adamw_8bit",
+    "dataloader_pin_memory":         False,  # saves RAM on 12GB system
+    "group_by_length":               True,   # speeds up training by grouping similar lengths
 }
 
-# ── LoRA Config (memory-efficient fine-tuning) ────────────────────────────────
+# ── LoRA Config — tuned for 4GB VRAM ─────────────────────────────────────────
 LORA_CONFIG = {
-    "r":             16,       # Rank — higher = more capacity, more memory
-    "lora_alpha":    32,
-    "target_modules": ["q_proj", "v_proj", "k_proj", "o_proj"],
-    "lora_dropout":  0.05,
-    "bias":          "none",
-    "task_type":     "CAUSAL_LM",
+    "r":              8,        # reduced from 16 — saves VRAM, enough for this task
+    "lora_alpha":     16,       # typically 2x rank
+    "target_modules": ["q_proj", "v_proj", "k_proj", "o_proj",
+                       "gate_proj", "up_proj", "down_proj"],  # Qwen uses MLP projections too
+    "lora_dropout":   0.05,
+    "bias":           "none",
+    "task_type":      "CAUSAL_LM",
 }
 
 # ── Cambridge Marking Criteria ────────────────────────────────────────────────
 AS_MARKING_BANDS = {
-    "12": "Outstanding: Clear, sustained argument. Two+ well-developed analytical points with strong chain of reasoning. Evaluates with a supported final judgment. Uses relevant economic concepts and diagrams correctly.",
+    "12":   "Outstanding: Clear, sustained argument. Two+ well-developed analytical points with strong chain of reasoning. Evaluates with a supported final judgment. Uses relevant economic concepts and diagrams correctly.",
     "10-11": "Strong: Good analytical development. Two points clearly developed. Some evaluation present. Minor gaps in the chain of reasoning or judgment.",
     "8-9":  "Good: Two points attempted. At least one well developed with analysis. Limited or weak evaluation.",
     "6-7":  "Adequate: Some analytical development. May have one well-developed point. Evaluation is superficial or missing.",
@@ -76,18 +85,18 @@ IGCSE_MARKING_BANDS = {
     "0":   "No relevant content.",
 }
 
-# ── Examiner Expectations (for feedback engine) ───────────────────────────────
+# ── Examiner Expectations ─────────────────────────────────────────────────────
 EXAMINER_EXPECTATIONS = {
     "AS_12_mark": {
         "structure": [
-            "Introduction with clear thesis (1–2 sentences only)",
+            "Introduction with clear thesis (1-2 sentences only)",
             "Point 1: State → Explain → Develop → Example (SEDE chain)",
             "Point 2: State → Explain → Develop → Example (SEDE chain)",
             "Evaluation: Weigh both sides, consider context/assumptions",
             "Conclusion: Supported final judgment (not a summary)",
         ],
         "must_include": [
-            "At least one relevant diagram (AD/AS, supply/demand, PPF, etc.)",
+            "At least one relevant diagram (AD/AS, supply/demand, PPF, etc.) — use [DIAGRAM 1] marker",
             "Economic terminology used correctly",
             "At least one real-world example or data reference",
             "Explicit evaluation words: 'However', 'It depends on', 'In the long run'",
@@ -126,7 +135,7 @@ EXAMINER_EXPECTATIONS = {
 }
 
 # ── Prompt Templates ──────────────────────────────────────────────────────────
-GRADING_SYSTEM_PROMPT = """You are an experienced Cambridge International Examinations (CIE) economics examiner with 15+ years of experience marking AS Level and IGCSE Economics papers. 
+GRADING_SYSTEM_PROMPT = """You are an experienced Cambridge International Examinations (CIE) economics examiner with 15+ years of experience marking AS Level and IGCSE Economics papers.
 
 You grade essays with precision, consistency, and detailed explanatory feedback. You know exactly what Cambridge examiners look for: analytical depth, evaluative judgment, correct economic terminology, and the ability to apply theory to real-world contexts.
 
@@ -157,11 +166,11 @@ Grade this essay as a Cambridge examiner. Provide your response in this exact fo
 ### MARK BAND: [Band description]
 
 ### WHAT THE EXAMINER SEES
-[2–3 sentences describing overall impression]
+[2-3 sentences describing overall impression]
 
 ### MARKS BREAKDOWN
 **Knowledge & Understanding (AO1):** [X marks] — [reason]
-**Analysis (AO2):** [X marks] — [reason]  
+**Analysis (AO2):** [X marks] — [reason]
 **Evaluation (AO3):** [X marks] — [reason]
 
 ### STRENGTHS
