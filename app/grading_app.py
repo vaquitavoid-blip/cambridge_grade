@@ -382,11 +382,22 @@ if mode == "📝 Grade Essay":
                 grader = load_grader()
                 result = grader.grade(question, essay, level_code, max_marks, verbose=False)
                 st.markdown("---")
-                render_grading_result(result, level_code, max_marks)
-                save_result({"mode": "grade", "level": level_code, "question": question,
-                             "essay": essay, "result": result})
+
+                # Always show raw output first so we can debug if parsing fails
+                if not result or len(result.strip()) < 20:
+                    st.error("Model returned empty or very short response. Check terminal for errors.")
+                    st.code(repr(result))
+                else:
+                    # Show raw response in expander always (helpful for debugging)
+                    with st.expander("🔍 Raw model output (click to inspect)", expanded=False):
+                        st.text(result)
+                    render_grading_result(result, level_code, max_marks)
+                    save_result({"mode": "grade", "level": level_code, "question": question,
+                                 "essay": essay, "result": result})
             except Exception as e:
                 st.error(f"Grading failed: {e}")
+                import traceback
+                st.code(traceback.format_exc())
                 st.info("Make sure the model is trained: `python src/train.py`")
 
 

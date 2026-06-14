@@ -147,8 +147,17 @@ class CambridgeGrader:
                 pad_token_id=self.tokenizer.eos_token_id,
             )
 
-        new_tokens = outputs[0][inputs["input_ids"].shape[1]:]
-        return self.tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
+        # Move outputs to CPU for decoding
+        output_ids   = outputs[0].cpu()
+        input_length = inputs["input_ids"].shape[1]
+        new_tokens   = output_ids[input_length:]
+        result       = self.tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
+
+        # Fallback: if new_tokens is empty, decode the full output
+        if not result:
+            result = self.tokenizer.decode(output_ids, skip_special_tokens=True).strip()
+
+        return result
 
     # ─────────────────────────────────────────────────────────────────────────
     # MODE 1 — GRADE
