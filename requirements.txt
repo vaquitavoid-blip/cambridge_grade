@@ -1,31 +1,16 @@
-# Cambridge Economics AI Grader - APP Dependencies
-# This is what Streamlit Cloud installs automatically (it always reads requirements.txt).
-# Contains ONLY what app/streamlit_app.py needs — lightweight, fast deploy.
-#
-# For the full ML training stack (used locally/Colab for src/train.py etc.),
-# use: pip install -r requirements-train.txt
-#
-# Install with: pip install -r requirements.txt
-
-# Data handling
+# Cambridge Economics AI Platform — APP dependencies (Streamlit Cloud)
 pandas==2.2.2
 numpy==1.26.4
-openpyxl==3.1.2       # Excel support for essay spreadsheets
-
-# OCR — for reading PDFs and images
-pdfplumber==0.11.0        # Extract text from digital PDFs (no OCR needed)
-PyMuPDF==1.24.3           # Convert scanned PDF pages to images for OCR
-pytesseract==0.3.10       # OCR engine wrapper (needs tesseract-ocr — see packages.txt)
-Pillow==10.3.0            # Image processing
-requests==2.31.0          # For optional Google Cloud Vision OCR (handwriting)
-
-# Web app
-streamlit==1.33.0         # Web interface
-plotly==5.21.0            # Charts in the dashboard
-
-# Google Sheets backend (for crowdsourced essay submissions)
+openpyxl==3.1.2
+pdfplumber==0.11.0
+PyMuPDF==1.24.3
+pytesseract==0.3.10
+Pillow==10.3.0
+requests==2.31.0
+streamlit==1.33.0
+plotly==5.21.0
 gspread==6.1.2
 google-auth==2.29.0
-
-# Utilities
-rich==13.7.1              # Pretty terminal output (used by sheets_backend CLI)
+rich==13.7.1
+chromadb==0.4.24
+sentence-transformers==2.7.0

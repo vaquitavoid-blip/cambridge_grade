@@ -1,4 +1,5 @@
 # src/data_prep.py
+<<<<<<< HEAD
 # ─────────────────────────────────────────────────────────────────────────────
 # Converts raw essays + grades into the JSONL format needed for fine-tuning
 # Handles CSV, Excel, or individual .txt files
@@ -10,32 +11,44 @@
 # learns a format the UI can't parse — which is what was causing marks
 # not to display.
 # ─────────────────────────────────────────────────────────────────────────────
+=======
+# Phase 8 — Expanded Training Pipeline
+# Supports: essays, mark schemes, examiner reports, model answers, borderline essays
+>>>>>>> 37ceb5e6 (Add Phase 1-10: RAG, analytics, grading platform)
 
 import json
 import random
-import pandas as pd
+import sys
 from pathlib import Path
 from typing import Optional
+import pandas as pd
 from rich.console import Console
 from rich.table import Table
 
-# Import config using relative path trick so it works from any directory
-import sys
 sys.path.append(str(Path(__file__).parent))
 from config import (
     RAW_ESSAYS_DIR, PROCESSED_DIR, TRAINING_FILE, EVAL_FILE,
+<<<<<<< HEAD
     GRADING_SYSTEM_PROMPT, get_grading_template, format_marks_breakdown,
     get_mark_band, AO_MARKS, EXAMINER_EXPECTATIONS,
+=======
+    GRADING_SYSTEM_PROMPT, AS_GRADING_TEMPLATE, IGCSE_GRADING_TEMPLATE,
+    AS_MARKING_BANDS, IGCSE_MARKING_BANDS,
+>>>>>>> 37ceb5e6 (Add Phase 1-10: RAG, analytics, grading platform)
 )
 
 console = Console()
 
+CSV_HEADERS = ["question", "essay", "mark", "max_marks", "level",
+               "feedback", "topic", "date_added", "source"]
+
 
 # ─────────────────────────────────────────────────────────────────────────────
-# ESSAY DATA CLASS
+# ESSAY ENTRY
 # ─────────────────────────────────────────────────────────────────────────────
 
 class EssayEntry:
+<<<<<<< HEAD
     """Represents one essay with its question, grade, and feedback."""
 
     def __init__(
@@ -55,31 +68,51 @@ class EssayEntry:
         self.level          = level.upper()
         self.feedback       = examiner_feedback.strip()
         self.question_topic = question_topic
+=======
+    def __init__(self, question, essay, mark, max_marks, level,
+                 examiner_feedback="", question_topic=""):
+        self.question  = str(question).strip()
+        self.essay     = str(essay).strip()
+        self.mark      = int(mark)
+        self.max_marks = int(max_marks)
+        self.level     = str(level).strip().upper()
+        self.feedback  = str(examiner_feedback).strip()
+        self.topic     = str(question_topic).strip()
+>>>>>>> 37ceb5e6 (Add Phase 1-10: RAG, analytics, grading platform)
         self._validate()
 
     def _validate(self):
         if self.level not in ("AS", "IGCSE"):
-            raise ValueError(f"Level must be 'AS' or 'IGCSE', got: {self.level}")
+            raise ValueError(f"Level must be AS or IGCSE, got: {self.level}")
         if not (0 <= self.mark <= self.max_marks):
-            raise ValueError(f"Mark {self.mark} out of range for max {self.max_marks}")
+            raise ValueError(f"Mark {self.mark} out of range 0-{self.max_marks}")
         if len(self.essay) < 50:
-            raise ValueError("Essay seems too short (< 50 chars). Check your data.")
-
-    @property
-    def question_type(self):
-        return f"{'12-mark evaluate' if self.max_marks == 12 else '8-mark discuss'}"
+            raise ValueError("Essay too short (< 50 chars)")
 
     @property
     def mark_band(self):
+<<<<<<< HEAD
         return get_mark_band(self.level, self.mark)
+=======
+        bands = AS_MARKING_BANDS if self.level == "AS" else IGCSE_MARKING_BANDS
+        for band_range, desc in bands.items():
+            if "-" in band_range:
+                low, high = map(int, band_range.split("-"))
+                if low <= self.mark <= high:
+                    return desc
+            elif self.mark == int(band_range):
+                return desc
+        return "Unknown band"
+>>>>>>> 37ceb5e6 (Add Phase 1-10: RAG, analytics, grading platform)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# TRAINING FORMAT BUILDER
+# BUILD TRAINING SAMPLE
 # ─────────────────────────────────────────────────────────────────────────────
 
 def build_training_sample(entry: EssayEntry) -> dict:
     """
+<<<<<<< HEAD
     Converts one essay entry into a chat-format training sample.
     Format: system + user (question+essay) → assistant (grading response)
 
@@ -94,19 +127,27 @@ def build_training_sample(entry: EssayEntry) -> dict:
         question=entry.question,
         essay=entry.essay,
     )
+=======
+    Builds a chat-format training sample using the correct level template.
+    The assistant response uses the flat KEY: value format matching our parser.
+    """
+    template = AS_GRADING_TEMPLATE if entry.level == "AS" else IGCSE_GRADING_TEMPLATE
+    user_msg = template.format(question=entry.question, essay=entry.essay)
+>>>>>>> 37ceb5e6 (Add Phase 1-10: RAG, analytics, grading platform)
 
     assistant_response = _build_target_response(entry)
 
     return {
         "messages": [
             {"role": "system",    "content": GRADING_SYSTEM_PROMPT},
-            {"role": "user",      "content": user_message},
+            {"role": "user",      "content": user_msg},
             {"role": "assistant", "content": assistant_response},
         ]
     }
 
 
 def _build_target_response(entry: EssayEntry) -> str:
+<<<<<<< HEAD
     """
     Constructs the ideal grader response from known mark + feedback.
 
@@ -128,12 +169,40 @@ def _build_as_target(entry: EssayEntry) -> str:
     strengths, weaknesses = _strengths_and_weaknesses(entry)
 
     return f"""### MARK AWARDED: {entry.mark}/{entry.max_marks}
+=======
+    """Builds the structured flat-key response the model learns to produce."""
+    ratio = entry.mark / entry.max_marks
 
-### MARK BAND: {entry.mark_band}
+    if entry.level == "AS":
+        # Distribute marks across AOs
+        ao1 = min(2, round(ratio * 2))
+        ao3 = min(4, round(ratio * 4 * 0.85))  # eval slightly harder to get
+        ao2 = min(6, entry.mark - ao1 - ao3)
+        ao2 = max(0, ao2)
+>>>>>>> 37ceb5e6 (Add Phase 1-10: RAG, analytics, grading platform)
 
-### WHAT THE EXAMINER SEES
-{entry.feedback if entry.feedback else _auto_impression(entry)}
+        confidence = "High" if ratio >= 0.8 or ratio <= 0.3 else "Medium"
+        feedback   = entry.feedback or _auto_impression(entry)
 
+        return f"""MARK: {entry.mark}/12
+BAND: {entry.mark_band}
+AO1_MARK: {ao1}/2
+AO1_REASON: {"Economic terminology used correctly and key concepts identified." if ao1 >= 2 else "Limited use of economic terminology; key concepts not clearly defined."}
+AO2_MARK: {ao2}/6
+AO2_REASON: {"Well-developed analytical chains with clear State-Explain-Develop-Example structure." if ao2 >= 5 else "Some analytical development but chains of reasoning incomplete or underdeveloped."}
+AO3_MARK: {ao3}/4
+AO3_REASON: {"Evaluative judgment present with supporting reasoning and conditions considered." if ao3 >= 3 else "Evaluation is limited or unsupported; final judgment does not answer to what extent."}
+CONFIDENCE: {confidence}
+IMPRESSION: {feedback}
+STRENGTH_1: {"Strong analytical development with clear economic reasoning." if ratio >= 0.6 else "Relevant economic knowledge demonstrated."}
+STRENGTH_2: {"Good use of real-world examples to support arguments." if ratio >= 0.5 else "Attempt made to develop points beyond simple definitions."}
+GAP_1: {"Evaluation needs to be more supported with specific conditions and a clear final judgment." if ao3 < 3 else "Some analytical chains could be further developed with more specific examples."}
+GAP_2: {"Consider using a diagram to strengthen the analytical argument." if ratio < 0.75 else "Ensure the conclusion directly answers the question asked."}
+EVALUATION_QUALITY: {"The evaluation demonstrates an attempt to weigh up arguments but lacks a fully supported judgment. The student needs to answer 'to what extent' with specific conditions." if ao3 < 3 else "Good evaluative content with supported judgment. The student considers conditions and context effectively."}
+MODEL_EVAL: In conclusion, the extent to which this policy is effective depends primarily on the specific economic context and the size of the multiplier effect. In an economy operating below full capacity, the impact would be significant; however, if the economy is near full employment, the effect would be mainly inflationary rather than stimulating real output. Therefore, while the policy has merit, its effectiveness is conditional rather than absolute.
+NEXT_BAND: {"Focus on completing your evaluative paragraph with a specific, supported final judgment. State what it depends on and why, rather than just listing both sides." if ao3 < 3 else "Ensure every analytical point follows the full SEDE chain and include a real-world example with data where possible."}"""
+
+<<<<<<< HEAD
 ### MARKS BREAKDOWN
 {format_marks_breakdown(entry.level, ao1, ao2, ao3, ao1_note, ao2_note, ao3_note)}
 
@@ -153,6 +222,34 @@ def _build_as_target(entry: EssayEntry) -> str:
 {_auto_improvement(entry)}
 """.strip()
 
+=======
+    else:  # IGCSE
+        ao1 = min(2, round(ratio * 2))
+        ao2 = min(6, entry.mark - ao1)
+        ao2 = max(0, ao2)
+        confidence = "High" if ratio >= 0.85 or ratio <= 0.25 else "Medium"
+        feedback   = entry.feedback or _auto_impression(entry)
+        accepted   = "ACCEPTED" if ratio >= 0.5 else "NOT_ACCEPTED - point may not align with Cambridge mark scheme"
+
+        return f"""MARK: {entry.mark}/8
+BAND: {entry.mark_band}
+AO1_MARK: {ao1}/2
+AO1_REASON: {"Points stated clearly and match accepted Cambridge mark scheme answers." if ao1 >= 2 else "Points stated but may not clearly match accepted mark scheme answers."}
+AO2_MARK: {ao2}/6
+AO2_REASON: {"Clear and direct explanations with relevant examples provided for each point." if ao2 >= 5 else "Some explanation present but could be clearer and more directly linked to examples."}
+AO3_MARK: 0/0
+AO3_REASON: Evaluation not required at IGCSE — any brief evaluative comment noted but not penalised.
+CONFIDENCE: {confidence}
+IMPRESSION: {feedback}
+POINT_1_STATUS: {accepted} — first point identified in the essay
+POINT_2_STATUS: {accepted} — second point identified in the essay
+STRENGTH_1: {"Two clear accepted points identified with explanation." if ratio >= 0.6 else "Relevant economic knowledge shown."}
+STRENGTH_2: {"Good use of examples to support the points made." if ratio >= 0.5 else "Attempt made to explain points beyond simple statements."}
+GAP_1: {"Ensure both points match standard Cambridge mark scheme accepted answers — original ideas score zero." if ratio < 0.75 else "Add a specific real-world example to fully develop each point."}
+GAP_2: {"Keep explanations simple and direct — clarity is rewarded over sophistication at IGCSE." if ratio < 0.6 else "A brief evaluative comment at the end can add to your mark."}
+MODEL_ANSWER: A full-mark answer would include two accepted Cambridge mark scheme points. For example: (1) [First accepted point] — [clear simple explanation] — [real-world example]. (2) [Second accepted point] — [clear simple explanation] — [real-world example]. A brief evaluative comment: Overall, the effect depends on [condition].
+NEXT_BAND: {"Identify two points that appear in Cambridge mark schemes for this topic, explain each clearly and simply, and add one example per point." if ratio < 0.5 else "Develop your second point more fully with a clearer explanation and example."}"""
+>>>>>>> 37ceb5e6 (Add Phase 1-10: RAG, analytics, grading platform)
 
 def _build_igcse_target(entry: EssayEntry) -> str:
     ao1, ao2, ao3 = _ao_split(entry)
@@ -196,15 +293,15 @@ def _build_igcse_target(entry: EssayEntry) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _auto_impression(entry: EssayEntry) -> str:
-    """Auto-generates an examiner impression based on mark."""
     ratio = entry.mark / entry.max_marks
     if ratio >= 0.85:
-        return "A well-constructed response demonstrating strong analytical skills and clear evaluative judgment. The candidate shows command of economic concepts and applies them effectively to the question."
+        return "A well-constructed response demonstrating strong knowledge and analytical skills."
     elif ratio >= 0.65:
-        return "A competent response with some good analytical development. The candidate demonstrates understanding but evaluation is underdeveloped or the argument lacks full consistency."
+        return "A competent response with good development but some gaps in analysis or evaluation."
     elif ratio >= 0.4:
-        return "A basic response showing some relevant knowledge. Analysis is limited and evaluation is mostly absent. The candidate describes rather than analyses."
+        return "A basic response showing some relevant knowledge but limited development."
     else:
+<<<<<<< HEAD
         return "A weak response. Relevant points are present but undeveloped. The candidate relies on definitions and assertions without demonstrating analytical understanding."
 
 
@@ -385,52 +482,42 @@ def _auto_improvement(entry: EssayEntry) -> str:
                 "(2) Explain each point simply in one or two sentences — avoid AS-level complexity. "
                 "(3) Add a clear example for each point. "
                 "(4) Add one short evaluative sentence at the end.")
+=======
+        return "A weak response with underdeveloped points and limited economic reasoning."
+>>>>>>> 37ceb5e6 (Add Phase 1-10: RAG, analytics, grading platform)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# DATA LOADERS — Load from CSV, Excel, or folder of .txt files
+# DATA LOADERS
 # ─────────────────────────────────────────────────────────────────────────────
 
 def load_from_csv(filepath: str) -> list[EssayEntry]:
-    """
-    Load essays from a CSV/Excel file.
-
-    Expected columns:
-    - question       (str)
-    - essay          (str)
-    - mark           (int)
-    - max_marks      (int)   — 12 or 8
-    - level          (str)   — "AS" or "IGCSE"
-    - feedback       (str)   — examiner feedback (can be empty)
-    - topic          (str)   — optional topic tag
-    """
     path = Path(filepath)
-    if path.suffix in (".xlsx", ".xls"):
-        df = pd.read_excel(filepath)
-    else:
-        df = pd.read_csv(filepath)
-
-    # Normalise column names
+    df   = pd.read_excel(filepath) if path.suffix in (".xlsx", ".xls") else pd.read_csv(filepath)
     df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
 
     required = {"question", "essay", "mark", "max_marks", "level"}
-    missing = required - set(df.columns)
+    missing  = required - set(df.columns)
     if missing:
-        raise ValueError(f"CSV is missing columns: {missing}\nFound: {list(df.columns)}")
+        raise ValueError(f"CSV missing columns: {missing}")
 
     entries = []
     for i, row in df.iterrows():
         try:
-            entry = EssayEntry(
-                question=str(row["question"]),
-                essay=str(row["essay"]),
-                mark=int(row["mark"]),
-                max_marks=int(row["max_marks"]),
+            entries.append(EssayEntry(
+                question=row["question"], essay=row["essay"],
+                mark=int(row["mark"]), max_marks=int(row["max_marks"]),
                 level=str(row["level"]),
+<<<<<<< HEAD
                 examiner_feedback=str(row.get("feedback", "")) if pd.notna(row.get("feedback", "")) else "",
                 question_topic=str(row.get("topic", "")) if pd.notna(row.get("topic", "")) else "",
             )
             entries.append(entry)
+=======
+                examiner_feedback=str(row.get("feedback", "")),
+                question_topic=str(row.get("topic", "")),
+            ))
+>>>>>>> 37ceb5e6 (Add Phase 1-10: RAG, analytics, grading platform)
         except Exception as e:
             console.print(f"[yellow]⚠ Skipping row {i+2}: {e}[/yellow]")
 
@@ -439,33 +526,17 @@ def load_from_csv(filepath: str) -> list[EssayEntry]:
 
 
 def load_from_txt_folder(folder: str) -> list[EssayEntry]:
-    """
-    Load essays from a folder of .txt files.
-    Each file should follow this format:
-
-        LEVEL: AS
-        MAX_MARKS: 12
-        MARK: 9
-        QUESTION: Evaluate the impact of a minimum wage on employment.
-        FEEDBACK: Good analysis but evaluation is weak.
-        ---
-        [essay text below the --- line]
-    """
-    folder_path = Path(folder)
     entries = []
-
-    for txt_file in folder_path.glob("*.txt"):
+    for txt_file in Path(folder).glob("*.txt"):
         try:
-            content = txt_file.read_text(encoding="utf-8")
+            content   = txt_file.read_text(encoding="utf-8")
             meta_part, essay_text = content.split("---", 1)
-
             meta = {}
             for line in meta_part.strip().splitlines():
                 if ":" in line:
-                    key, val = line.split(":", 1)
-                    meta[key.strip().upper()] = val.strip()
-
-            entry = EssayEntry(
+                    k, v = line.split(":", 1)
+                    meta[k.strip().upper()] = v.strip()
+            entries.append(EssayEntry(
                 question=meta.get("QUESTION", ""),
                 essay=essay_text.strip(),
                 mark=int(meta.get("MARK", 0)),
@@ -473,20 +544,21 @@ def load_from_txt_folder(folder: str) -> list[EssayEntry]:
                 level=meta.get("LEVEL", "AS"),
                 examiner_feedback=meta.get("FEEDBACK", ""),
                 question_topic=meta.get("TOPIC", ""),
-            )
-            entries.append(entry)
+            ))
         except Exception as e:
             console.print(f"[yellow]⚠ Skipping {txt_file.name}: {e}[/yellow]")
 
-    console.print(f"[green]✓ Loaded {len(entries)} essays from folder[/green]")
+    if entries:
+        console.print(f"[green]✓ Loaded {len(entries)} essays from txt folder[/green]")
     return entries
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# DATASET BUILDER — Converts entries to JSONL training files
+# DATASET BUILDER
 # ─────────────────────────────────────────────────────────────────────────────
 
 def build_dataset(entries: list[EssayEntry], eval_split: float = 0.15):
+<<<<<<< HEAD
     """
     Converts essay entries to training + eval JSONL files.
     - 85% goes to training, 15% to evaluation by default
@@ -497,8 +569,10 @@ def build_dataset(entries: list[EssayEntry], eval_split: float = 0.15):
     stratify by level so both AS and IGCSE are represented in eval whenever
     enough essays of that level exist.
     """
+=======
+>>>>>>> 37ceb5e6 (Add Phase 1-10: RAG, analytics, grading platform)
     if len(entries) < 5:
-        console.print("[red]⚠ You need at least 5 essays to build a dataset.[/red]")
+        console.print("[red]Need at least 5 essays to build a dataset.[/red]")
         return
 
     random.seed(42)
@@ -527,21 +601,19 @@ def build_dataset(entries: list[EssayEntry], eval_split: float = 0.15):
     _write_jsonl(train_set, TRAINING_FILE)
     _write_jsonl(eval_set,  EVAL_FILE)
 
-    # Print summary table
     table = Table(title="Dataset Summary")
-    table.add_column("Split",    style="cyan")
-    table.add_column("Count",    style="magenta")
-    table.add_column("AS essays",  style="green")
-    table.add_column("IGCSE essays", style="green")
+    table.add_column("Split",         style="cyan")
+    table.add_column("Count",         style="magenta")
+    table.add_column("AS essays",     style="green")
+    table.add_column("IGCSE essays",  style="green")
 
     for name, split in [("Training", train_set), ("Evaluation", eval_set)]:
-        as_count    = sum(1 for e in split if e.level == "AS")
-        igcse_count = sum(1 for e in split if e.level == "IGCSE")
-        table.add_row(name, str(len(split)), str(as_count), str(igcse_count))
-
+        table.add_row(name, str(len(split)),
+                      str(sum(1 for e in split if e.level == "AS")),
+                      str(sum(1 for e in split if e.level == "IGCSE")))
     console.print(table)
-    console.print(f"\n[green]✓ Training data saved to:   {TRAINING_FILE}[/green]")
-    console.print(f"[green]✓ Evaluation data saved to: {EVAL_FILE}[/green]")
+    console.print(f"\n[green]✓ Training data: {TRAINING_FILE}[/green]")
+    console.print(f"[green]✓ Eval data:     {EVAL_FILE}[/green]")
 
     if len(eval_set) == 0:
         console.print(
@@ -554,18 +626,17 @@ def build_dataset(entries: list[EssayEntry], eval_split: float = 0.15):
 def _write_jsonl(entries: list[EssayEntry], output_path: Path):
     with open(output_path, "w", encoding="utf-8") as f:
         for entry in entries:
-            sample = build_training_sample(entry)
-            f.write(json.dumps(sample) + "\n")
+            f.write(json.dumps(build_training_sample(entry)) + "\n")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# MAIN — Run this file directly to process your data
+# MAIN
 # ─────────────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    console.print("\n[bold cyan]Cambridge Economics Grader — Data Preparation[/bold cyan]\n")
+    console.print("\n[bold cyan]Cambridge Economics AI — Data Preparation[/bold cyan]\n")
 
-    # If Google Sheets is configured, pull the latest submissions first
+    # Sync from Google Sheets if connected
     try:
         import sheets_backend as backend
         status = backend.get_backend_status()
@@ -579,22 +650,20 @@ if __name__ == "__main__":
 
     all_entries = []
 
-    # Load from CSV if it exists
     csv_path = RAW_ESSAYS_DIR / "essays.csv"
     if csv_path.exists():
         console.print(f"Found essays.csv — loading...")
         all_entries.extend(load_from_csv(str(csv_path)))
 
-    # Load from txt folder
-    txt_entries = load_from_txt_folder(str(RAW_ESSAYS_DIR))
-    all_entries.extend(txt_entries)
+    all_entries.extend(load_from_txt_folder(str(RAW_ESSAYS_DIR)))
 
     if not all_entries:
-        console.print(
-            "[yellow]No essays found. Add essays to data/raw_essays/\n"
-            "Either as essays.csv (see README) or as .txt files.\n"
-            "Or use: python scripts/add_essay.py to add essays one by one.[/yellow]"
-        )
+        console.print("[yellow]No essays found. Add essays via the Streamlit app or scripts/add_essay.py[/yellow]")
     else:
+<<<<<<< HEAD
         console.print(f"\n[bold]Total essays loaded: {len(all_entries)}[/bold]")
         build_dataset(all_entries)
+=======
+        console.print(f"\n[bold]Total essays: {len(all_entries)}[/bold]")
+        build_dataset(all_entries)
+>>>>>>> 37ceb5e6 (Add Phase 1-10: RAG, analytics, grading platform)

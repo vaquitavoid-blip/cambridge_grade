@@ -116,12 +116,21 @@ AS_MARKING_BANDS = {
 }
 
 IGCSE_MARKING_BANDS = {
+<<<<<<< HEAD
     "8":   "Full marks: Two well-developed accepted points, each clearly explained with a relevant example. A brief evaluative comment present (1-2 sentences only). All content aligns with standard mark scheme accepted answers.",
     "7":   "Strong: Two developed accepted points with explanation. Minor gap in example or evaluative comment.",
     "5-6": "Good: Two accepted points, at least one developed with explanation and example. No evaluation required for this band.",
     "3-4": "Adequate: One well-developed accepted point OR two basic accepted points. Minimal development.",
     "1-2": "Weak: One basic accepted point. Definition-level only.",
     "0":   "No relevant content, or all points fall outside accepted mark scheme answers.",
+=======
+    "8":   "Full marks: Two well-developed accepted points with clear economic reasoning and relevant examples. Only brief evaluation is required.",
+    "7":   "Strong: Two developed points with clear explanation and examples. Minor weakness in development or evaluative comment.",
+    "5-6": "Good: Two relevant points, at least one developed with explanation and example. Evaluation may be limited or absent.",
+    "3-4": "Adequate: One developed point OR two basic points. Limited explanation.",
+    "1-2": "Weak: One basic relevant point. Mostly definition-level response.",
+    "0":   "No relevant economic content.",
+>>>>>>> 37ceb5e6 (Add Phase 1-10: RAG, analytics, grading platform)
 }
 
 # ── IGCSE Mark Scheme Bank ─────────────────────────────────────────────────────
@@ -221,6 +230,7 @@ EXAMINER_EXPECTATIONS = {
             "Weak evaluation — stating both sides without a supported final judgment",
         ],
     },
+<<<<<<< HEAD
     "IGCSE_8_mark": {
         "structure": [
             "Point 1: State a clear accepted point (must align with mark scheme)",
@@ -244,11 +254,37 @@ EXAMINER_EXPECTATIONS = {
             "Spending time on evaluation when content points are incomplete",
         ],
     },
+=======
+   "IGCSE_8_mark": {
+    "structure": [
+        "Point 1: State the point clearly",
+        "Explain: Why/how does this happen?",
+        "Develop: Consequence or impact",
+        "Example: Real-world or textbook example",
+        "Point 2: Repeat the above",
+        "Optional brief judgment at the end",
+    ],
+    "must_include": [
+        "Two distinct economic points",
+        "Clear economic vocabulary",
+        "At least one relevant example",
+        "Simple and accurate explanation",
+    ],
+    "common_mistakes": [
+        "Writing several shallow points instead of two developed points",
+        "Missing examples",
+        "Repeating the question",
+        "Weak explanation of economic reasoning",
+        "Overly complex AS-level evaluation",
+    ],
+  },
+>>>>>>> 37ceb5e6 (Add Phase 1-10: RAG, analytics, grading platform)
 }
 
 # ── Prompt Templates ──────────────────────────────────────────────────────────
 GRADING_SYSTEM_PROMPT = """You are an experienced Cambridge International Examinations (CIE) economics examiner with 15+ years of experience marking both AS Level and IGCSE Economics papers.
 
+<<<<<<< HEAD
 You apply DIFFERENT standards depending on the level:
 
 FOR AS LEVEL (12-mark questions):
@@ -257,6 +293,29 @@ FOR AS LEVEL (12-mark questions):
 - Analysis chains must be fully developed: State → Explain → Develop → Example
 - Original thought and independent reasoning is rewarded
 - Diagrams are useful but not compulsory
+=======
+IMPORTANT DIFFERENCE BETWEEN LEVELS:
+
+FOR AS LEVEL:
+- Evaluation (AO3) carries significant weight.
+- Strong supported judgments are expected.
+- Students should consider conditions, assumptions, short-run vs long-run effects and magnitude.
+- Weak evaluation should be penalised.
+
+FOR IGCSE:
+- Content and explanation are far more important than evaluation.
+- A brief evaluative comment is sufficient.
+- Full marks can be awarded with minimal evaluation if content and development are excellent.
+- Do NOT apply AS Level evaluation standards to IGCSE essays.
+- Reward clear explanations, accurate economics and relevant examples.
+
+You always:
+- Award marks based on Cambridge standards.
+- Explain specifically why marks were awarded or deducted.
+- Give actionable examiner-style feedback.
+- Identify strengths and weaknesses.
+- Suggest how to improve the answer."""
+>>>>>>> 37ceb5e6 (Add Phase 1-10: RAG, analytics, grading platform)
 
 FOR IGCSE (8-mark questions):
 - Content accuracy is paramount — points must match Cambridge mark scheme accepted answers

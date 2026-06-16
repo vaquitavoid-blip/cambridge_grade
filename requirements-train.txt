@@ -1,43 +1,27 @@
-# Cambridge Economics AI Grader - TRAINING Dependencies
-# For LOCAL use only — NOT used by Streamlit Cloud deployment.
-# Install with: pip install -r requirements-train.txt
-#
-# NOTE: Install CUDA PyTorch FIRST before running this:
+# Cambridge Economics AI Platform — TRAINING dependencies (local only)
+# Install CUDA PyTorch first:
 #   pip install torch==2.2.2 --index-url https://download.pytorch.org/whl/cu121
-#   then: pip install -r requirements-train.txt
+# Then:
+#   pip install -r requirements-train.txt
 
-# Core ML / Fine-tuning (Qwen2.5-1.5B + LoRA on RTX 2050)
+# ML stack
 transformers==4.40.0
 datasets==2.19.0
-torch==2.2.2             # install GPU version separately (see note above)
+torch==2.2.2
 accelerate==0.29.3
-peft==0.10.0             # LoRA fine-tuning (memory efficient)
-bitsandbytes==0.43.1     # 4-bit quantization for 4GB VRAM
-trl==0.8.6               # Supervised Fine-Tuning trainer
+peft==0.10.0
+bitsandbytes==0.43.1
+trl==0.8.6
 
-# Data handling
+# Data
 pandas==2.2.2
 numpy==1.26.4
 scikit-learn==1.4.2
 openpyxl==3.1.2
 
-# Evaluation & metrics
+# Evaluation
 rouge-score==0.1.2
 evaluate==0.4.1
-
-# CLI / display
-rich==13.7.1
-questionary==2.0.1
-tqdm==4.66.2
-
-# Utilities
-python-dotenv==1.0.1
-matplotlib==3.8.4
-seaborn==0.13.2
-
-# Jupyter (optional, for explore_data.ipynb)
-jupyter==1.0.0
-ipykernel==6.29.4
 
 # OCR
 pdfplumber==0.11.0
@@ -46,10 +30,24 @@ pytesseract==0.3.10
 Pillow==10.3.0
 requests==2.31.0
 
-# Web app (also included here so one install covers everything locally)
+# RAG
+chromadb==0.4.24
+sentence-transformers==2.7.0
+
+# Web app
 streamlit==1.33.0
 plotly==5.21.0
 
-# Google Sheets backend
+# Sheets
 gspread==6.1.2
 google-auth==2.29.0
+
+# Utils
+rich==13.7.1
+questionary==2.0.1
+tqdm==4.66.2
+python-dotenv==1.0.1
+matplotlib==3.8.4
+seaborn==0.13.2
+jupyter==1.0.0
+ipykernel==6.29.4
